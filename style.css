@@ -1,0 +1,228 @@
+/*1 design tokens (CSS variable)*/
+:root{
+  --bg-color: #0b0f19;         /* Dark background */
+  --card-bg: #151c2c;          /* Card background */
+  --text-primary: #f8fafc;     /* Main white text */
+  --text-secondary: #94a3b8;   /* Muted gray text */
+  --accent-blue: #2563eb;      /* Primary action blue */
+  --accent-green: #16a34a;     /* Fan score badge green */
+  --border-color: #1e293b;     /* Subtle divider borders */
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+/*2.Global reset */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body{
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  line-height: 1.6;
+  padding: 20px;
+}
+/* 4. BASE LINK & BUTTON RESET */
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+/* HEADER & NAV LAYOUT */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+nav {
+  display: flex;
+  gap: 24px;
+}
+
+nav a {
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+nav a:hover {
+  color: var(--text-primary);
+}
+
+/* AUTH BUTTON STYLING */
+#login-btn {
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+#login-btn:hover {
+  opacity: 0.9;
+}
+/* HERO SECTION */
+.hero {
+  text-align: center;
+  padding: 48px 20px;
+  max-width: 800px;
+  margin: 0 auto 48px auto;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.hero p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+}
+
+.btn {
+  display: inline-block;
+  background-color: var(--accent-blue);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* FEATURES GRID */
+.features {
+  margin-bottom: 64px;
+}
+
+.features h2, .drops-section h2 {
+  font-size: 1.75rem;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background-color: var(--card-bg);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.feature-card h3 {
+  margin: 12px 0 8px 0;
+}
+
+.feature-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* EVENT DISCOVERY GRID */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.event-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.img-placeholder {
+  background-color: var(--border-color);
+  height: 160px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
+.badge {
+  background-color: rgba(22, 163, 74, 0.2);
+  color: var(--accent-green);
+  border: 1px solid var(--accent-green);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  align-self: flex-start;
+  margin-bottom: 12px;
+}
+
+.event-details {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 8px 0;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.price small {
+  color: var(--text-secondary);
+  font-weight: normal;
+  font-size: 0.8rem;
+}
+
+.reserve-btn {
+  margin-top: auto;
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* FOOTER */
+footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
