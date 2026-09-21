@@ -3,16 +3,25 @@ const state = {
   isLoggedIn: false,
   user: {
     name: "Alex",
-    fanScore: 100 // Try changing this value later to test gating!
+    fanScore: 100
   }
 };
+
+window.state = state;
 
 // 2. DOM ELEMENT SELECTORS
 const authContainer = document.getElementById('auth-container');
 const loginBtn = document.getElementById('login-btn');
 const reserveBtns = document.querySelectorAll('.reserve-btn');
-window.state = state;
-console.log("App initialized. Current user score:", state.user.fanScore);
+
+// MODAL DOM ELEMENTS
+const modalOverlay = document.getElementById('modal-overlay');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const modalActionBtn = document.getElementById('modal-action-btn');
+const modalTitle = document.getElementById('modal-title');
+const modalMessage = document.getElementById('modal-message');
+const modalIcon = document.getElementById('modal-status-icon');
+
 // 3. UI RENDER FUNCTION
 function renderAuthUI() {
   if (state.isLoggedIn) {
@@ -24,14 +33,12 @@ function renderAuthUI() {
       </div>
     `;
 
-    // Attach listener to the newly created logout button
     document.getElementById('logout-btn').addEventListener('click', toggleAuth);
   } else {
     authContainer.innerHTML = `
       <button id="login-btn">Login / Sign Up</button>
     `;
 
-    // Attach listener to the newly created login button
     document.getElementById('login-btn').addEventListener('click', toggleAuth);
   }
 }
@@ -42,33 +49,67 @@ function toggleAuth() {
   renderAuthUI();
 }
 
-// Initial Event Listener for Login
 loginBtn.addEventListener('click', toggleAuth);
-// 5. TICKET RESERVATION GATING LOGIC
+
+// 5. MODAL CONTROL HELPERS
+function showModal(title, message, iconSymbol, isSuccess = true) {
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  modalIcon.textContent = iconSymbol;
+
+  if (isSuccess) {
+    modalIcon.style.color = "var(--accent-green)";
+  } else {
+    modalIcon.style.color = "#ef4444";
+  }
+
+  modalOverlay.classList.remove('hidden');
+}
+
+function closeModal() {
+  modalOverlay.classList.add('hidden');
+}
+
+modalCloseBtn.addEventListener('click', closeModal);
+modalActionBtn.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target === modalOverlay) closeModal();
+});
+
+// 6. TICKET RESERVATION LOGIC (NO ALERTS)
 function handleReservation(event) {
-  // Check if user is logged in first
   if (!state.isLoggedIn) {
-    alert("Please log in to participate in fair ticket drops!");
+    showModal(
+      "Authentication Required",
+      "Please log in to your FanFirst account to participate in fair-access ticket drops.",
+      "🔒",
+      false
+    );
     return;
   }
 
-  // Get the event card element
   const card = event.target.closest('.event-card');
   const eventTitle = card.querySelector('h3').textContent;
-
-  // Extract required score from badge text (e.g., "Req. Fan Score: 80+" -> 80)
   const badgeText = card.querySelector('.badge').textContent;
   const requiredScore = parseInt(badgeText.replace(/[^0-9]/g, ''), 10);
 
-  // Compare user score vs required score
   if (state.user.fanScore >= requiredScore) {
-    alert(`Success! Your Fan Score of ${state.user.fanScore} qualifies you for "${eventTitle}". Ticket reserved at face value!`);
+    showModal(
+      "Ticket Reserved!",
+      `Success! Your Fan Score of ${state.user.fanScore} meets the ${requiredScore}+ requirement for "${eventTitle}". Your face-value ticket has been reserved.`,
+      "🎉",
+      true
+    );
   } else {
-    alert(`Access Denied: "${eventTitle}" requires a Fan Score of ${requiredScore}+. Your current score is ${state.user.fanScore}.`);
+    showModal(
+      "Access Restricted",
+      `"${eventTitle}" requires a minimum Fan Score of ${requiredScore}+. Your current Fan Score is ${state.user.fanScore}.`,
+      "🚫",
+      false
+    );
   }
 }
 
-// Attach event listeners to all reserve buttons
 reserveBtns.forEach(button => {
   button.addEventListener('click', handleReservation);
 });
