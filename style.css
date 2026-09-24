@@ -388,3 +388,13 @@ nav a:hover {
     margin: 0 var(--space-xs);
   }
 }
+/* DISABLED BUTTON FIX */
+.btn:disabled,
+button:disabled {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+  cursor: not-allowed !important;
+  opacity: 0.8;
+  box-shadow: none !important;
+}

@@ -22,16 +22,16 @@ const modalTitle = document.getElementById('modal-title');
 const modalMessage = document.getElementById('modal-message');
 const modalIcon = document.getElementById('modal-status-icon');
 
-// 3. UI RENDER FUNCTION WITH SCORE MODIFIERS
+// 3. UI RENDER FUNCTION
 function renderAuthUI() {
   if (state.isLoggedIn) {
     authContainer.innerHTML = `
       <div class="user-profile" style="display: flex; align-items: center; gap: 8px;">
         <span class="badge" id="user-score-badge">Fan Score: ${state.user.fanScore}</span>
-        <button id="score-down-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white;">-10</button>
-        <button id="score-up-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white;">+10</button>
+        <button id="score-down-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white; cursor: pointer;">-10</button>
+        <button id="score-up-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white; cursor: pointer;">+10</button>
         <span style="font-weight: 600; margin-left: 4px;">${state.user.name}</span>
-        <button id="logout-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 4px;">Logout</button>
+        <button id="logout-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 4px; cursor: pointer;">Logout</button>
       </div>
     `;
 
@@ -40,25 +40,25 @@ function renderAuthUI() {
     document.getElementById('score-down-btn').addEventListener('click', () => updateScore(-10));
   } else {
     authContainer.innerHTML = `
-      <button id="login-btn">Login / Sign Up</button>
+      <button id="login-btn" class="btn">Login / Sign Up</button>
     `;
 
     document.getElementById('login-btn').addEventListener('click', toggleAuth);
   }
 }
 
-// SCORE UPDATE HELPER
-function updateScore(amount) {
-  state.user.fanScore = Math.max(0, state.user.fanScore + amount);
-  renderAuthUI();
-}
-// 4. AUTH TOGGLE HANDLER
+// 4. AUTH & SCORE HANDLERS
 function toggleAuth() {
   state.isLoggedIn = !state.isLoggedIn;
   renderAuthUI();
 }
 
-loginBtn.addEventListener('click', toggleAuth);
+function updateScore(amount) {
+  state.user.fanScore = Math.max(0, state.user.fanScore + amount);
+  renderAuthUI();
+}
+
+loginBtn?.addEventListener('click', toggleAuth);
 
 // 5. MODAL CONTROL HELPERS
 function showModal(title, message, iconSymbol, isSuccess = true) {
@@ -67,9 +67,9 @@ function showModal(title, message, iconSymbol, isSuccess = true) {
   modalIcon.textContent = iconSymbol;
 
   if (isSuccess) {
-    modalIcon.style.color = "var(--accent-green)";
+    modalIcon.style.color = "var(--accent-primary)";
   } else {
-    modalIcon.style.color = "#ef4444";
+    modalIcon.style.color = "var(--accent-danger)";
   }
 
   modalOverlay.classList.remove('hidden');
@@ -85,7 +85,7 @@ modalOverlay.addEventListener('click', (e) => {
   if (e.target === modalOverlay) closeModal();
 });
 
-// 6. TICKET RESERVATION LOGIC WITH BUTTON LOCKING
+// 6. TICKET RESERVATION LOGIC
 function handleReservation(event) {
   const targetBtn = event.target;
 
@@ -112,11 +112,9 @@ function handleReservation(event) {
       true
     );
 
-    // LOCK BUTTON STATE
+    // LOCK BUTTON STATE (Styling handled cleanly by CSS disabled state)
     targetBtn.textContent = "Reserved ✓";
     targetBtn.disabled = true;
-    targetBtn.style.backgroundColor = "var(--border-color)";
-    targetBtn.style.cursor = "not-allowed";
   } else {
     showModal(
       "Access Restricted",
@@ -127,6 +125,7 @@ function handleReservation(event) {
   }
 }
 
+// Attach event listeners to all reserve buttons
 reserveBtns.forEach(button => {
   button.addEventListener('click', handleReservation);
 });
