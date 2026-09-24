@@ -1,239 +1,315 @@
-/*1 design tokens (CSS variable)*/
-:root{
-  --bg-color: #0b0f19;         /* Dark background */
-  --card-bg: #151c2c;          /* Card background */
-  --text-primary: #f8fafc;     /* Main white text */
-  --text-secondary: #94a3b8;   /* Muted gray text */
-  --accent-blue: #2563eb;      /* Primary action blue */
-  --accent-green: #16a34a;     /* Fan score badge green */
-  --border-color: #1e293b;     /* Subtle divider borders */
-  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-/*2.Global reset */
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body{
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  font-family: var(--font-family);
-  line-height: 1.6;
-  padding: 20px;
-}
-/* 4. BASE LINK & BUTTON RESET */
-a {
-  color: var(--accent-blue);
-  text-decoration: none;
+/* ==========================================================================
+   1. DESIGN TOKENS & TYPOGRAPHY SCALE
+   ========================================================================== */
+:root {
+  /* Color Palette (Obsidian + Emerald Glow) */
+  --bg-main: #0c0e12;
+  --bg-card: #14171f;
+  --bg-card-hover: #1c202b;
+  --border-color: #262c3a;
+  --border-accent: #3b4459;
+
+  /* Accent Colors */
+  --accent-primary: #10b981; /* Mint Emerald for Trust & Access */
+  --accent-primary-hover: #059669;
+  --accent-danger: #f43f5e;
+
+  /* Text Color Scale */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Typography Scale */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+
+  /* Spacing System (8px Grid Scale) */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 64px;
+
+  /* Depth & Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
+/* ==========================================================================
+   2. GLOBAL RESET & BASE STYLES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-/* HEADER & NAV LAYOUT */
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container Utility */
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* ==========================================================================
+   3. HEADER & NAVIGATION
+   ========================================================================== */
 header {
+  border-bottom: 1px solid var(--border-color);
+  background-color: rgba(12, 14, 18, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: var(--space-sm) 0;
+}
+
+.header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
-  border-radius: 8px;
-  margin-bottom: 32px;
 }
 
-.logo {
-  font-size: 1.25rem;
-  font-weight: 700;
+.brand-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
+  text-decoration: none;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
-nav {
-  display: flex;
-  gap: 24px;
+.brand-logo::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: var(--accent-primary);
+  border-radius: 50%;
+  box-shadow: var(--shadow-glow);
 }
 
 nav a {
   color: var(--text-secondary);
+  text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s ease;
+  margin-left: var(--space-md);
+  transition: color 0.15s ease;
+  font-size: 0.95rem;
 }
 
 nav a:hover {
-  color: var(--text-primary);
+  color: var(--accent-primary);
 }
 
-/* AUTH BUTTON STYLING */
-#login-btn {
-  background-color: var(--accent-blue);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+/* ==========================================================================
+   4. BUTTONS & INTERACTIVE ELEMENTS
+   ========================================================================== */
+.btn {
+  background-color: var(--accent-primary);
+  color: #042f2e;
+  border: 1px solid var(--accent-primary);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
   font-weight: 600;
-  transition: opacity 0.2s ease;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
 }
 
-#login-btn:hover {
-  opacity: 0.9;
+.btn:hover {
+  background-color: var(--accent-primary-hover);
+  border-color: var(--accent-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
 }
-/* HERO SECTION */
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+/* Button Secondary Variant */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--text-secondary);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   5. HERO & FEATURE SECTIONS
+   ========================================================================== */
 .hero {
-  text-align: center;
-  padding: 48px 20px;
-  max-width: 800px;
-  margin: 0 auto 48px auto;
+  padding: var(--space-xl) 0 var(--space-lg) 0;
+  text-align: left; /* Left aligned for intentional product feel */
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--space-xl);
 }
 
 .hero h1 {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-sm);
+  max-width: 800px;
 }
 
 .hero p {
   color: var(--text-secondary);
-  font-size: 1.1rem;
-  margin-bottom: 24px;
+  font-size: 1.15rem;
+  max-width: 600px;
+  margin-bottom: var(--space-md);
 }
 
-.btn {
-  display: inline-block;
-  background-color: var(--accent-blue);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-/* FEATURES GRID */
-.features {
-  margin-bottom: 64px;
-}
-
-.features h2, .drops-section h2 {
-  font-size: 1.75rem;
-  margin-bottom: 24px;
-  text-align: center;
-}
-
+/* Features Grid */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
 }
 
 .feature-card {
-  background-color: var(--card-bg);
-  padding: 24px;
-  border-radius: 8px;
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.feature-card:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
 }
 
 .feature-card h3 {
-  margin: 12px 0 8px 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin-bottom: var(--space-xs);
 }
 
 .feature-card p {
   color: var(--text-secondary);
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* EVENT DISCOVERY GRID */
+/* ==========================================================================
+   6. EVENT DROPS & CARDS
+   ========================================================================== */
+.drops-section h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.02em;
+}
+
 .events-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-md);
 }
 
 .event-card {
-  background-color: var(--card-bg);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s ease;
 }
 
-.img-placeholder {
-  background-color: var(--border-color);
-  height: 160px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-  font-size: 0.85rem;
+.event-card:hover {
+  border-color: var(--border-accent);
+  background-color: var(--bg-card-hover);
 }
 
 .badge {
-  background-color: rgba(22, 163, 74, 0.2);
-  color: var(--accent-green);
-  border: 1px solid var(--accent-green);
-  padding: 4px 8px;
-  border-radius: 4px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--accent-primary);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   align-self: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
+}
+
+.event-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  margin-bottom: var(--space-2xs);
 }
 
 .event-details {
   color: var(--text-secondary);
   font-size: 0.9rem;
-  margin: 8px 0;
+  margin-bottom: var(--space-md);
 }
 
 .price {
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 16px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  margin-top: auto;
 }
 
 .price small {
-  color: var(--text-secondary);
-  font-weight: normal;
+  color: var(--text-muted);
   font-size: 0.8rem;
+  font-weight: normal;
 }
 
-.reserve-btn {
-  margin-top: auto;
-  background-color: var(--accent-blue);
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-/* FOOTER */
-footer {
-  margin-top: 64px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-color);
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-/* MODAL OVERLAY & CARD */
+/* ==========================================================================
+   7. CUSTOM MODAL (NO ALERTS)
+   ========================================================================== */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.75);
+  inset: 0;
+  background-color: rgba(4, 6, 9, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,45 +325,66 @@ footer {
 }
 
 .modal-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 32px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
   width: 90%;
-  max-width: 440px;
+  max-width: 420px;
   text-align: center;
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 16px;
+  top: var(--space-sm);
+  right: var(--space-sm);
   background: transparent;
   border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
+  color: var(--text-muted);
+  font-size: 1.25rem;
   cursor: pointer;
+  padding: var(--space-2xs);
+  transition: color 0.15s;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
 }
 
 .modal-icon {
   font-size: 2.5rem;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-xs);
 }
 
 .modal-card h3 {
-  font-size: 1.35rem;
-  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin-bottom: var(--space-xs);
 }
 
 .modal-card p {
   color: var(--text-secondary);
   font-size: 0.95rem;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-md);
   line-height: 1.5;
 }
 
-.modal-actions .btn {
-  width: 100%;
+/* ==========================================================================
+   8. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 640px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .header-inner {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  nav a {
+    margin: 0 var(--space-xs);
+  }
 }
