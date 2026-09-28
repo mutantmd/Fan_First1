@@ -4,13 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fan First | Event Tickets</title>
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-
-  <!-- Stylesheet -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,118 +16,111 @@
     <a href="#" class="brand-logo" data-page="home">Fan First</a>
     <nav>
       <a href="#" class="nav-link active" data-page="home">Events</a>
-      <a href="#" class="nav-link" data-page="tickets">My Tickets</a>
-      <a href="#" class="nav-link" data-page="about">About Us</a>
-      <button type="button" class="btn btn-signin" id="open-auth-btn">Sign In</button>
+      <a href="#" class="nav-link" data-page="tickets">My tickets</a>
+      <a href="#" class="nav-link" data-page="about">About</a>
+      <button type="button" class="btn btn-signin" id="open-auth-btn">Sign in</button>
     </nav>
   </div>
 </header>
 
 <main class="container">
-  <!-- PAGE 1: HOME / EVENTS -->
   <section id="page-home" class="page-view active-page">
     <div class="hero">
-      <h1>Live events.<br><span class="highlight">Fans always come first.</span></h1>
-      <p>Secure your tickets instantly. Choose your quantity, check out with one click, and access all your passes under My Tickets.</p>
+      <h1>Live events, fans first.</h1>
+      <p>Choose how many tickets you need, check out, and find your passes under My tickets.</p>
     </div>
 
     <div class="events-section">
-      <h2>Upcoming Events</h2>
+      <h2>Upcoming events</h2>
       <div class="events-grid" id="events-grid"></div>
     </div>
 
     <div class="events-section">
-      <h2>Why Fan First?</h2>
+      <h2>How it works</h2>
       <div class="features-grid">
         <div class="feature-card">
-          <h3>Flexible Group Quantities</h3>
-          <p class="event-details">Adjust order sizes easily by 1 or 10 tickets at a time, up to 50 passes per transaction.</p>
+          <h3>Order up to 50 at once</h3>
+          <p class="event-details">Change the quantity by 1 or by 10, up to 50 tickets per order.</p>
         </div>
         <div class="feature-card">
-          <h3>Instant Ticket Delivery</h3>
-          <p class="event-details">Your confirmed order appears under My Tickets the exact moment your order is placed.</p>
+          <h3>Passes show up right away</h3>
+          <p class="event-details">Your order appears under My tickets as soon as you place it.</p>
         </div>
         <div class="feature-card">
-          <h3>Zero Hidden Fees</h3>
-          <p class="event-details">Transparent pricing. The price shown per ticket is the exact final price you pay.</p>
+          <h3>The price you see is the price</h3>
+          <p class="event-details">The price shown per ticket is what you pay. Nothing is added at checkout.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PAGE 2: MY TICKETS -->
   <section id="page-tickets" class="page-view">
     <div class="page-header">
-      <h2>My Tickets</h2>
-      <p>Your confirmed passes and orders for upcoming events.</p>
+      <h2>My tickets</h2>
+      <p>Your confirmed passes for upcoming events.</p>
     </div>
     <div class="tickets-container" id="tickets-container"></div>
   </section>
 
-  <!-- PAGE 3: ABOUT US -->
   <section id="page-about" class="page-view">
     <div class="page-header">
       <h2>About Fan First</h2>
-      <p>Built for passionate fans who value fair access, simple ticketing, and zero hassle.</p>
+      <p>A ticketing site for fans who want a fair price and a simple checkout.</p>
     </div>
 
     <div class="about-content">
       <div class="about-card">
-        <h3>Our Mission</h3>
-        <p>Fan First was created to remove the stress and surprise fees from live event ticketing. Whether you're catching an esports tournament, a cinema screening, or a live show, we ensure a transparent, lightning-fast experience.</p>
+        <h3>What we do</h3>
+        <p>Fan First sells tickets for esports tournaments, cinema screenings and live shows. The price you see is the price you pay, and your passes are in your account as soon as you check out.</p>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card">
-          <span class="stat-number">100%</span>
-          <span class="stat-label">Transparent Pricing</span>
+          <span class="stat-number">50</span>
+          <span class="stat-label">Tickets per order, at most</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">0</span>
+          <span class="stat-label">Fees added at checkout</span>
         </div>
         <div class="stat-card">
           <span class="stat-number">Instant</span>
-          <span class="stat-label">Pass Confirmation</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-number">50k+</span>
-          <span class="stat-label">Happy Fans</span>
+          <span class="stat-label">Passes after checkout</span>
         </div>
       </div>
     </div>
   </section>
 </main>
 
-<!-- CONFIRMATION MODAL -->
 <div class="modal-overlay hidden" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-card">
-    <button type="button" class="modal-close" id="modal-close" aria-label="Close modal">&times;</button>
-    <div class="modal-icon" aria-hidden="true">🎟️</div>
-    <h3 id="modal-title">Order Confirmed!</h3>
+    <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    <h3 id="modal-title">Order confirmed</h3>
     <p id="modal-text"></p>
-    <button type="button" class="btn" id="modal-view">View My Tickets</button>
+    <button type="button" class="btn" id="modal-view">View my tickets</button>
   </div>
 </div>
 
-<!-- SIGN IN / AUTH MODAL -->
 <div class="modal-overlay hidden" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
   <div class="modal-card auth-card">
-    <button type="button" class="modal-close" id="auth-close" aria-label="Close modal">&times;</button>
-    <h3 id="auth-title">Welcome Back</h3>
-    <p>Sign in to access your saved tickets and preferences.</p>
+    <button type="button" class="modal-close" id="auth-close" aria-label="Close">&times;</button>
+    <h3 id="auth-title">Sign in</h3>
+    <p>Sign in to see your saved tickets.</p>
 
     <form id="auth-form">
       <div class="form-group">
-        <label for="auth-email">Email Address</label>
-        <input type="email" id="auth-email" class="form-input" placeholder="name@example.com" required>
+        <label for="auth-email">Email</label>
+        <input type="email" id="auth-email" class="form-input" autocomplete="email" required>
       </div>
       <div class="form-group">
         <label for="auth-password">Password</label>
-        <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required>
+        <input type="password" id="auth-password" class="form-input" autocomplete="current-password" required>
       </div>
-      <button type="submit" class="btn">Sign In</button>
+      <button type="submit" class="btn">Sign in</button>
     </form>
   </div>
 </div>
 
-<!-- JavaScript Logic -->
 <script src="app.js"></script>
 </body>
 </html>
