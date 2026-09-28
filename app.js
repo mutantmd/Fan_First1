@@ -1,223 +1,205 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // 1. Event Data
-  const events = [
-    {
-      id: 1,
-      name: "Valorant Masters Watchparty",
-      details: "Sat 17 Oct · 6:00 PM · Electronic City, Bengaluru",
-      price: 499,
-      tag: "Selling Fast"
-    },
-    {
-      id: 2,
-      name: "Midnight Electronic Sessions",
-      details: "Sat 24 Oct · 9:00 PM · Indiranagar, Bengaluru",
-      price: 1299,
-      tag: "Popular"
-    },
-    {
-      id: 3,
-      name: "Open Air Sci-Fi Cinema Night",
-      details: "Sun 1 Nov · 7:30 PM · Koramangala, Bengaluru",
-      price: 699,
-      tag: "New"
-    },
-    {
-      id: 4,
-      name: "Standup Comedy Cellar Special",
-      details: "Fri 6 Nov · 8:00 PM · Church Street, Bengaluru",
-      price: 899,
-      tag: "Limited Passes"
-    }
-  ];
+// 1. APPLICATION STATE
+const state = {
+  isLoggedIn: false,
+  user: {
+    name: "Alex",
+    fanScore: 100
+  },
+  reservedTickets: []
+};
 
-  const MIN = 1;
-  const MAX = 50;
+window.state = state;
 
-  // Track state
-  const qty = Object.fromEntries(events.map(e => [e.id, 1]));
-  const orders = [];
-  let userSignedIn = false;
+// 2. DOM ELEMENT SELECTORS
+const authContainer = document.getElementById('auth-container');
+const reserveBtns = document.querySelectorAll('.reserve-btn');
+const ticketsList = document.getElementById('tickets-list');
 
-  // Currency Formatter
-  const inr = n => "₹" + n.toLocaleString("en-IN");
+// MODAL DOM ELEMENTS
+const modalOverlay = document.getElementById('modal-overlay');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const modalActionBtn = document.getElementById('modal-action-btn');
+const modalTitle = document.getElementById('modal-title');
+const modalMessage = document.getElementById('modal-message');
+const modalIcon = document.getElementById('modal-status-icon');
 
-  // DOM Reference Elements
-  const grid = document.getElementById("events-grid");
-  const ticketsBox = document.getElementById("tickets-container");
+// 3. NAVIGATION ROUTER
+function navigateToPage(targetPageId) {
+  const pageViews = document.querySelectorAll('.page-view');
+  const navLinks = document.querySelectorAll('.nav-link');
 
-  // Order Modal
-  const modal = document.getElementById("modal");
-  const modalText = document.getElementById("modal-text");
-  const modalClose = document.getElementById("modal-close");
-  const modalView = document.getElementById("modal-view");
+  // Hide all page views
+  pageViews.forEach(page => page.classList.remove('active-page'));
 
-  // Auth Modal
-  const authModal = document.getElementById("auth-modal");
-  const openAuthBtn = document.getElementById("open-auth-btn");
-  const authClose = document.getElementById("auth-close");
-  const authForm = document.getElementById("auth-form");
-
-  // 2. Render Events Grid
-  function renderEvents() {
-    if (!grid) return;
-
-    grid.innerHTML = events.map(e => `
-      <article class="event-card">
-        <span class="badge">${e.tag}</span>
-        <h3>${e.name}</h3>
-        <p class="event-details">${e.details}</p>
-        <p class="price">${inr(e.price)} <small>per ticket</small></p>
-
-        <div class="qty-control" data-id="${e.id}">
-          <button type="button" class="qty-btn" data-step="-10" title="-10 tickets" aria-label="Remove 10 tickets">−10</button>
-          <button type="button" class="qty-btn" data-step="-1" title="-1 ticket" aria-label="Remove 1 ticket">−</button>
-          <span class="qty-value" aria-live="polite">${qty[e.id]}</span>
-          <button type="button" class="qty-btn" data-step="1" title="+1 ticket" aria-label="Add 1 ticket">+</button>
-          <button type="button" class="qty-btn" data-step="10" title="+10 tickets" aria-label="Add 10 tickets">+10</button>
-        </div>
-
-        <button type="button" class="btn" data-buy="${e.id}">Get Tickets</button>
-      </article>
-    `).join("");
-
-    events.forEach(syncControls);
+  // Show target page view
+  const targetPage = document.getElementById(`page-${targetPageId}`);
+  if (targetPage) {
+    targetPage.classList.add('active-page');
   }
 
-  // 3. Synchronize Quantity Controls State
-  function syncControls(e) {
-    const box = grid.querySelector(`.qty-control[data-id="${e.id}"]`);
-    if (!box) return;
-
-    const currentQty = qty[e.id];
-    box.querySelector(".qty-value").textContent = currentQty;
-
-    box.querySelectorAll(".qty-btn").forEach(btn => {
-      const step = Number(btn.dataset.step);
-      const nextValue = currentQty + step;
-      btn.disabled = nextValue < MIN || nextValue > MAX;
-    });
-  }
-
-  // 4. Render Purchased Tickets View
-  function renderTickets() {
-    if (!ticketsBox) return;
-
-    if (!orders.length) {
-      ticketsBox.innerHTML = `
-        <div class="empty-state">
-          <p>You haven't purchased any tickets yet.</p>
-          <button type="button" class="btn btn-secondary" data-page="home">Browse Upcoming Events</button>
-        </div>`;
-      return;
-    }
-
-    ticketsBox.innerHTML = `
-      <div class="events-grid">
-        ${orders.map(o => `
-          <article class="event-card">
-            <span class="badge">Confirmed Pass</span>
-            <h3>${o.name}</h3>
-            <p class="event-details">${o.details}</p>
-            <p class="price">${o.count} Pass${o.count > 1 ? "es" : ""} × ${inr(o.price)}</p>
-            <p class="event-details"><strong>Total Paid:</strong> ${inr(o.count * o.price)}</p>
-          </article>
-        `).join("")}
-      </div>`;
-  }
-
-  // 5. Page Routing Handler
-  function showPage(pageName) {
-    document.querySelectorAll(".page-view").forEach(p => {
-      p.classList.toggle("active-page", p.id === "page-" + pageName);
-    });
-
-    document.querySelectorAll(".nav-link").forEach(link => {
-      link.classList.toggle("active", link.dataset.page === pageName);
-    });
-
-    if (pageName === "tickets") {
-      renderTickets();
-    }
-  }
-
-  // 6. Interaction Event Handlers
-  grid.addEventListener("click", ev => {
-    const qtyBtn = ev.target.closest(".qty-btn");
-    if (qtyBtn) {
-      const card = qtyBtn.closest(".qty-control");
-      const id = Number(card.dataset.id);
-      const step = Number(qtyBtn.dataset.step);
-
-      qty[id] = Math.min(MAX, Math.max(MIN, qty[id] + step));
-      syncControls(events.find(e => e.id === id));
-      return;
-    }
-
-    const buyBtn = ev.target.closest("[data-buy]");
-    if (buyBtn) {
-      const id = Number(buyBtn.dataset.buy);
-      const eventObj = events.find(x => x.id === id);
-      const count = qty[id];
-
-      orders.push({ ...eventObj, count });
-
-      modalText.textContent = `${count} ticket${count > 1 ? "s" : ""} confirmed for ${eventObj.name}. Total: ${inr(count * eventObj.price)}.`;
-      modal.classList.remove("hidden");
-    }
-  });
-
-  // Navigation Links
-  document.addEventListener("click", ev => {
-    const navItem = ev.target.closest("[data-page]");
-    if (navItem) {
-      ev.preventDefault();
-      showPage(navItem.dataset.page);
-    }
-  });
-
-  // Modal Closures
-  const closeModal = targetModal => targetModal.classList.add("hidden");
-
-  modalClose.addEventListener("click", () => closeModal(modal));
-  modalView.addEventListener("click", () => {
-    closeModal(modal);
-    showPage("tickets");
-  });
-
-  // Auth Modal Triggers
-  openAuthBtn.addEventListener("click", () => {
-    if (userSignedIn) {
-      userSignedIn = false;
-      openAuthBtn.textContent = "Sign In";
-      openAuthBtn.classList.remove("btn-secondary");
+  // Update active state on navigation links
+  navLinks.forEach(link => {
+    if (link.dataset.page === targetPageId) {
+      link.classList.add('active');
     } else {
-      authModal.classList.remove("hidden");
+      link.classList.remove('active');
     }
   });
 
-  authClose.addEventListener("click", () => closeModal(authModal));
+  // Refresh My Tickets if navigating to that page
+  if (targetPageId === 'my-tickets') {
+    renderMyTickets();
+  }
+}
 
-  authForm.addEventListener("submit", ev => {
-    ev.preventDefault();
-    userSignedIn = true;
-    openAuthBtn.textContent = "Account";
-    openAuthBtn.classList.add("btn-secondary");
-    closeModal(authModal);
-  });
-
-  // Overlay & Escape Key listeners for all modals
-  [modal, authModal].forEach(m => {
-    m.addEventListener("click", ev => { if (ev.target === m) closeModal(m); });
-  });
-
-  document.addEventListener("keydown", ev => {
-    if (ev.key === "Escape") {
-      closeModal(modal);
-      closeModal(authModal);
-    }
-  });
-
-  // Initial Load
-  renderEvents();
+// Event Delegation for Navigation Links
+document.addEventListener('click', (e) => {
+  const navLink = e.target.closest('.nav-link');
+  if (navLink && navLink.dataset.page) {
+    e.preventDefault();
+    navigateToPage(navLink.dataset.page);
+  }
 });
+
+// 4. UI RENDER FUNCTIONS
+function renderAuthUI() {
+  if (state.isLoggedIn) {
+    authContainer.innerHTML = `
+      <div class="user-profile" style="display: flex; align-items: center; gap: 8px;">
+        <span class="badge" id="user-score-badge">Fan Score: ${state.user.fanScore}</span>
+        <button id="score-down-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white; cursor: pointer;">-10</button>
+        <button id="score-up-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white; cursor: pointer;">+10</button>
+        <span style="font-weight: 600; margin-left: 4px;">${state.user.name}</span>
+        <button id="logout-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 4px; cursor: pointer;">Logout</button>
+      </div>
+    `;
+
+    document.getElementById('logout-btn').addEventListener('click', toggleAuth);
+    document.getElementById('score-up-btn').addEventListener('click', () => updateScore(10));
+    document.getElementById('score-down-btn').addEventListener('click', () => updateScore(-10));
+  } else {
+    authContainer.innerHTML = `
+      <button id="login-btn" class="btn">Login / Sign Up</button>
+    `;
+
+    document.getElementById('login-btn').addEventListener('click', toggleAuth);
+  }
+}
+
+function renderMyTickets() {
+  if (!ticketsList) return;
+
+  if (state.reservedTickets.length === 0) {
+    ticketsList.innerHTML = `
+      <div class="empty-state">
+        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted);">confirmation_number</span>
+        <p>You haven't reserved any tickets yet.</p>
+        <a href="#" class="btn btn-secondary nav-link" data-page="home">Explore Drops</a>
+      </div>
+    `;
+  } else {
+    ticketsList.innerHTML = `
+      <div class="events-grid">
+        ${state.reservedTickets.map(ticket => `
+          <div class="event-card">
+            <div class="badge">CONFIRMED RESERVATION</div>
+            <h3>${ticket.title}</h3>
+            <p class="event-details">${ticket.details}</p>
+            <p class="price">${ticket.price}</p>
+            <button class="btn btn-secondary" disabled>Reserved ✓</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+// 5. AUTH & SCORE HANDLERS
+function toggleAuth() {
+  state.isLoggedIn = !state.isLoggedIn;
+  renderAuthUI();
+}
+
+function updateScore(amount) {
+  state.user.fanScore = Math.max(0, state.user.fanScore + amount);
+  renderAuthUI();
+}
+
+// 6. MODAL CONTROL HELPERS
+function showModal(title, message, iconSymbol, isSuccess = true) {
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  modalIcon.textContent = iconSymbol;
+
+  if (isSuccess) {
+    modalIcon.style.color = "var(--accent-primary)";
+  } else {
+    modalIcon.style.color = "var(--accent-danger)";
+  }
+
+  modalOverlay.classList.remove('hidden');
+}
+
+function closeModal() {
+  modalOverlay.classList.add('hidden');
+}
+
+modalCloseBtn.addEventListener('click', closeModal);
+modalActionBtn.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target === modalOverlay) closeModal();
+});
+
+// 7. TICKET RESERVATION LOGIC
+function handleReservation(event) {
+  const targetBtn = event.target;
+
+  if (!state.isLoggedIn) {
+    showModal(
+        "Authentication Required",
+        "Please log in to your FanFirst account to participate in fair-access ticket drops.",
+        "🔒",
+        false
+    );
+    return;
+  }
+
+  const card = targetBtn.closest('.event-card');
+  const eventTitle = card.querySelector('h3').textContent;
+  const eventDetails = card.querySelector('.event-details').textContent;
+  const price = card.querySelector('.price').childNodes[0].textContent.trim();
+  const badgeText = card.querySelector('.badge').textContent;
+  const requiredScore = parseInt(badgeText.replace(/[^0-9]/g, ''), 10);
+
+  if (state.user.fanScore >= requiredScore) {
+    state.reservedTickets.push({
+      title: eventTitle,
+      details: eventDetails,
+      price: price
+    });
+
+    showModal(
+        "Ticket Reserved!",
+        `Success! Your Fan Score of ${state.user.fanScore} meets the ${requiredScore}+ requirement for "${eventTitle}". Your face-value ticket has been reserved.`,
+        "🎉",
+        true
+    );
+
+    targetBtn.textContent = "Reserved ✓";
+    targetBtn.disabled = true;
+  } else {
+    showModal(
+        "Access Restricted",
+        `"${eventTitle}" requires a minimum Fan Score of ${requiredScore}+. Your current Fan Score is ${state.user.fanScore}.`,
+        "🚫",
+        false
+    );
+  }
+}
+
+reserveBtns.forEach(button => {
+  button.addEventListener('click', handleReservation);
+});
+
+// INITIAL RENDER
+renderAuthUI();
