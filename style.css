@@ -1,70 +1,81 @@
 /* ==========================================================================
-   1. DESIGN TOKENS & TYPOGRAPHY SCALE
+   1. ROOT VARIABLES & THEME SETUP
    ========================================================================== */
 :root {
-  /* Color Palette (Obsidian + Emerald Glow) */
-  --bg-main: #0c0e12;
-  --bg-card: #14171f;
-  --bg-card-hover: #1c202b;
-  --border-color: #262c3a;
-  --border-accent: #3b4459;
+  /* Color Palette */
+  --bg-dark: #080a0f;
+  --bg-card: rgba(18, 22, 31, 0.75);
+  --bg-card-hover: rgba(24, 30, 42, 0.9);
+  --bg-glass: rgba(15, 20, 29, 0.65);
 
-  /* Accent Colors */
-  --accent-primary: #10b981; /* Mint Emerald for Trust & Access */
-  --accent-primary-hover: #059669;
-  --accent-danger: #f43f5e;
-
-  /* Text Color Scale */
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
 
-  /* Typography Scale */
+  /* Dynamic Accents & Gradients */
+  --accent-primary: #10b981;
+  --accent-primary-hover: #059669;
+  --accent-gradient: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --accent-glow: rgba(16, 185, 129, 0.25);
+  --accent-danger: #ef4444;
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(16, 185, 129, 0.3);
+
+  /* Typography */
   --font-display: 'Syne', sans-serif;
   --font-body: 'Space Grotesk', sans-serif;
 
-  /* Spacing System (8px Grid Scale) */
-  --space-2xs: 4px;
+  /* Spacing */
   --space-xs: 8px;
   --space-sm: 16px;
   --space-md: 24px;
   --space-lg: 32px;
   --space-xl: 64px;
 
-  /* Depth & Radii */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
-  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Elevation & Shadows */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 25px var(--accent-glow);
 }
 
 /* ==========================================================================
    2. GLOBAL RESET & BASE STYLES
    ========================================================================== */
-*, *::before, *::after {
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  background-color: var(--bg-main);
+  background-color: var(--bg-dark);
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-body);
   line-height: 1.6;
-  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Container Utility */
 .container {
-  width: 100%;
-  max-width: 1120px;
+  max-width: 1140px;
   margin: 0 auto;
   padding: 0 var(--space-md);
+}
+
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.25s ease;
 }
 
 /* ==========================================================================
@@ -72,250 +83,242 @@ body {
    ========================================================================== */
 header {
   border-bottom: 1px solid var(--border-color);
-  background-color: rgba(12, 14, 18, 0.85);
-  backdrop-filter: blur(12px);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: var(--space-sm) 0;
+  transition: border-color 0.3s ease;
 }
 
 .header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 76px;
 }
 
 .brand-logo {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--text-primary);
-  text-decoration: none;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.brand-logo::before {
-  content: '';
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  background-color: var(--accent-primary);
-  border-radius: 50%;
-  box-shadow: var(--shadow-glow);
+  transition: transform 0.3s ease;
 }
 
-nav a {
+.brand-logo:hover {
+  transform: scale(1.03);
+}
+
+.nav-link {
   color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 500;
-  margin-left: var(--space-md);
-  transition: color 0.15s ease;
   font-size: 0.95rem;
+  font-weight: 500;
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.25s ease;
 }
 
-nav a:hover {
-  color: var(--accent-primary);
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-link.active {
+  color: var(--accent-primary) !important;
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--accent-primary);
 }
 
 /* ==========================================================================
-   4. BUTTONS & INTERACTIVE ELEMENTS
+   4. BUTTONS & BADGES
    ========================================================================== */
 .btn {
-  background-color: var(--accent-primary);
-  color: #042f2e;
-  border: 1px solid var(--accent-primary);
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xs);
+  background: var(--accent-gradient);
+  color: #04130e;
+  font-family: var(--font-body);
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 }
 
 .btn:hover {
-  background-color: var(--accent-primary-hover);
-  border-color: var(--accent-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  color: #000;
 }
 
 .btn:active {
   transform: translateY(0);
 }
 
-.btn:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 3px;
-}
-
-/* Button Secondary Variant */
 .btn-secondary {
-  background-color: transparent;
+  background: transparent;
+  border: 1px solid var(--border-accent);
   color: var(--text-primary);
-  border-color: var(--border-accent);
-}
-
-.btn-secondary:hover {
-  background-color: var(--bg-card-hover);
-  border-color: var(--text-secondary);
   box-shadow: none;
 }
 
+.btn-secondary:hover {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-primary);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(4px);
+}
+
 /* ==========================================================================
-   5. HERO & FEATURE SECTIONS
+   5. HERO & SECTIONS
    ========================================================================== */
 .hero {
   padding: var(--space-xl) 0 var(--space-lg) 0;
-  text-align: left; /* Left aligned for intentional product feel */
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: var(--space-xl);
+  max-width: 760px;
 }
 
 .hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5vw, 3.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-size: 3.5rem;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   margin-bottom: var(--space-sm);
-  max-width: 800px;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .hero p {
   color: var(--text-secondary);
-  font-size: 1.15rem;
-  max-width: 600px;
+  font-size: 1.25rem;
   margin-bottom: var(--space-md);
+  max-width: 620px;
 }
 
-/* Features Grid */
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+.drops-section {
+  padding: var(--space-lg) 0;
 }
 
-.feature-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.feature-card:hover {
-  border-color: var(--border-accent);
-  transform: translateY(-2px);
-}
-
-.feature-card h3 {
+.drops-section h2 {
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  margin-bottom: var(--space-xs);
-}
-
-.feature-card p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 2.25rem;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.01em;
 }
 
 /* ==========================================================================
-   6. EVENT DROPS & CARDS
+   6. GRIDS & CARDS
    ========================================================================== */
-.drops-section h2 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  margin-bottom: var(--space-md);
-  letter-spacing: -0.02em;
-}
-
-.events-grid {
+.events-grid,
+.features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--space-md);
 }
 
-.event-card {
-  background-color: var(--bg-card);
+.event-card,
+.feature-card {
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-card);
-  transition: all 0.2s ease;
+  gap: var(--space-xs);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
-.event-card:hover {
+.event-card:hover,
+.feature-card:hover {
   border-color: var(--border-accent);
-  background-color: var(--bg-card-hover);
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
 }
 
-.badge {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--accent-primary);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  align-self: flex-start;
-  margin-bottom: var(--space-sm);
-}
-
-.event-card h3 {
+.event-card h3,
+.feature-card h3 {
   font-family: var(--font-display);
-  font-size: 1.35rem;
-  margin-bottom: var(--space-2xs);
+  font-size: 1.4rem;
+  margin-top: var(--space-xs);
+  color: var(--text-primary);
 }
 
 .event-details {
   color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: var(--space-md);
+  font-size: 0.92rem;
 }
 
 .price {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 600;
-  margin-bottom: var(--space-md);
-  margin-top: auto;
+  margin: var(--space-xs) 0;
+  color: var(--text-primary);
 }
 
 .price small {
-  color: var(--text-muted);
   font-size: 0.8rem;
-  font-weight: normal;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* ==========================================================================
-   7. CUSTOM MODAL (NO ALERTS)
+   7. MODAL SYSTEM
    ========================================================================== */
 .modal-overlay {
   position: fixed;
-  inset: 0;
-  background-color: rgba(4, 6, 9, 0.85);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(4, 6, 10, 0.8);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
   opacity: 1;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s ease;
 }
 
 .modal-overlay.hidden {
@@ -325,28 +328,33 @@ nav a:hover {
 }
 
 .modal-card {
-  background-color: var(--bg-card);
+  background: var(--bg-dark);
   border: 1px solid var(--border-accent);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   width: 90%;
-  max-width: 420px;
-  text-align: center;
+  max-width: 460px;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .modal-close {
   position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
+  top: 20px;
+  right: 20px;
   background: transparent;
   border: none;
-  color: var(--text-muted);
-  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
   cursor: pointer;
-  padding: var(--space-2xs);
-  transition: color 0.15s;
+  transition: color 0.2s ease;
 }
 
 .modal-close:hover {
@@ -354,47 +362,106 @@ nav a:hover {
 }
 
 .modal-icon {
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin-bottom: var(--space-xs);
 }
 
 .modal-card h3 {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   margin-bottom: var(--space-xs);
 }
 
 .modal-card p {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   margin-bottom: var(--space-md);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* ==========================================================================
-   8. RESPONSIVE BREAKPOINTS
+   8. PAGE ROUTING & MULTI-PAGE STYLES
    ========================================================================== */
-@media (max-width: 640px) {
+.page-view {
+  display: none;
+}
+
+.page-view.active-page {
+  display: block;
+  animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  padding: var(--space-lg) 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--space-lg);
+}
+
+.page-header h2 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  margin-bottom: var(--space-xs);
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.tickets-container {
+  min-height: 250px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-md);
+  background: var(--bg-card);
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--text-secondary);
+  backdrop-filter: blur(8px);
+}
+
+/* DISABLED BUTTON OVERRIDE */
+.btn:disabled,
+button:disabled {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border-color) !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* ==========================================================================
+   9. MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 768px) {
   .hero h1 {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
 
   .header-inner {
     flex-direction: column;
+    height: auto;
+    padding: var(--space-sm) 0;
     gap: var(--space-sm);
   }
 
-  nav a {
-    margin: 0 var(--space-xs);
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px !important;
   }
-}
-/* DISABLED BUTTON FIX */
-.btn:disabled,
-button:disabled {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  color: var(--text-muted) !important;
-  border-color: var(--border-color) !important;
-  cursor: not-allowed !important;
-  opacity: 0.8;
-  box-shadow: none !important;
 }

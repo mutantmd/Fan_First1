@@ -4,15 +4,16 @@ const state = {
   user: {
     name: "Alex",
     fanScore: 100
-  }
+  },
+  reservedTickets: []
 };
 
 window.state = state;
 
 // 2. DOM ELEMENT SELECTORS
 const authContainer = document.getElementById('auth-container');
-const loginBtn = document.getElementById('login-btn');
 const reserveBtns = document.querySelectorAll('.reserve-btn');
+const ticketsList = document.getElementById('tickets-list');
 
 // MODAL DOM ELEMENTS
 const modalOverlay = document.getElementById('modal-overlay');
@@ -22,7 +23,45 @@ const modalTitle = document.getElementById('modal-title');
 const modalMessage = document.getElementById('modal-message');
 const modalIcon = document.getElementById('modal-status-icon');
 
-// 3. UI RENDER FUNCTION
+// 3. NAVIGATION ROUTER
+function navigateToPage(targetPageId) {
+  const pageViews = document.querySelectorAll('.page-view');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  // Hide all page views
+  pageViews.forEach(page => page.classList.remove('active-page'));
+
+  // Show target page view
+  const targetPage = document.getElementById(`page-${targetPageId}`);
+  if (targetPage) {
+    targetPage.classList.add('active-page');
+  }
+
+  // Update active state on navigation links
+  navLinks.forEach(link => {
+    if (link.dataset.page === targetPageId) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+
+  // Refresh My Tickets if navigating to that page
+  if (targetPageId === 'my-tickets') {
+    renderMyTickets();
+  }
+}
+
+// Event Delegation for Navigation Links
+document.addEventListener('click', (e) => {
+  const navLink = e.target.closest('.nav-link');
+  if (navLink && navLink.dataset.page) {
+    e.preventDefault();
+    navigateToPage(navLink.dataset.page);
+  }
+});
+
+// 4. UI RENDER FUNCTIONS
 function renderAuthUI() {
   if (state.isLoggedIn) {
     authContainer.innerHTML = `
@@ -47,7 +86,35 @@ function renderAuthUI() {
   }
 }
 
-// 4. AUTH & SCORE HANDLERS
+function renderMyTickets() {
+  if (!ticketsList) return;
+
+  if (state.reservedTickets.length === 0) {
+    ticketsList.innerHTML = `
+      <div class="empty-state">
+        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted);">confirmation_number</span>
+        <p>You haven't reserved any tickets yet.</p>
+        <a href="#" class="btn btn-secondary nav-link" data-page="home">Explore Drops</a>
+      </div>
+    `;
+  } else {
+    ticketsList.innerHTML = `
+      <div class="events-grid">
+        ${state.reservedTickets.map(ticket => `
+          <div class="event-card">
+            <div class="badge">CONFIRMED RESERVATION</div>
+            <h3>${ticket.title}</h3>
+            <p class="event-details">${ticket.details}</p>
+            <p class="price">${ticket.price}</p>
+            <button class="btn btn-secondary" disabled>Reserved ✓</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+// 5. AUTH & SCORE HANDLERS
 function toggleAuth() {
   state.isLoggedIn = !state.isLoggedIn;
   renderAuthUI();
@@ -58,9 +125,7 @@ function updateScore(amount) {
   renderAuthUI();
 }
 
-loginBtn?.addEventListener('click', toggleAuth);
-
-// 5. MODAL CONTROL HELPERS
+// 6. MODAL CONTROL HELPERS
 function showModal(title, message, iconSymbol, isSuccess = true) {
   modalTitle.textContent = title;
   modalMessage.textContent = message;
@@ -85,7 +150,7 @@ modalOverlay.addEventListener('click', (e) => {
   if (e.target === modalOverlay) closeModal();
 });
 
-// 6. TICKET RESERVATION LOGIC
+// 7. TICKET RESERVATION LOGIC
 function handleReservation(event) {
   const targetBtn = event.target;
 
@@ -101,10 +166,18 @@ function handleReservation(event) {
 
   const card = targetBtn.closest('.event-card');
   const eventTitle = card.querySelector('h3').textContent;
+  const eventDetails = card.querySelector('.event-details').textContent;
+  const price = card.querySelector('.price').childNodes[0].textContent.trim();
   const badgeText = card.querySelector('.badge').textContent;
   const requiredScore = parseInt(badgeText.replace(/[^0-9]/g, ''), 10);
 
   if (state.user.fanScore >= requiredScore) {
+    state.reservedTickets.push({
+      title: eventTitle,
+      details: eventDetails,
+      price: price
+    });
+
     showModal(
       "Ticket Reserved!",
       `Success! Your Fan Score of ${state.user.fanScore} meets the ${requiredScore}+ requirement for "${eventTitle}". Your face-value ticket has been reserved.`,
@@ -112,7 +185,6 @@ function handleReservation(event) {
       true
     );
 
-    // LOCK BUTTON STATE (Styling handled cleanly by CSS disabled state)
     targetBtn.textContent = "Reserved ✓";
     targetBtn.disabled = true;
   } else {
@@ -125,7 +197,9 @@ function handleReservation(event) {
   }
 }
 
-// Attach event listeners to all reserve buttons
 reserveBtns.forEach(button => {
   button.addEventListener('click', handleReservation);
 });
+
+// INITIAL RENDER
+renderAuthUI();
