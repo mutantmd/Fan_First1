@@ -35,7 +35,7 @@ const expectedFilesInDistDir = [
   'index.html',
 
   'js/',
-  'js/app.js',
+  'js/fanfirst.js',
   'js/vendor/',
   'js/vendor/.gitkeep',
   'LICENSE.txt',

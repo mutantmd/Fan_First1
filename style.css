@@ -412,7 +412,7 @@ header nav > .nav-link:hover {
 
 /* --------------------------------------------------------------------------
    States
-   Classes that app.js toggles. Nothing else in this file should depend on
+   Classes that fanfirst.js toggles. Nothing else in this file should depend on
    them, so the script can change without touching the components above.
    -------------------------------------------------------------------------- */
 .page-view {

@@ -34,7 +34,7 @@ A basic HTML5 Boilerplate site initially looks something like this:
 ├── doc
 ├── img
 ├── js
-│   ├── app.js
+│   ├── fanfirst.js
     └── vendor
 ├── .editorconfig
 ├── 404.html
