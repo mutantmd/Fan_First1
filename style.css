@@ -1,247 +1,463 @@
 :root {
-  --paper: #f0f1f3;
-  --ink: #14213d;
-  --ink-soft: #3a4660;
-  --ink-faint: #5b6680;
-  --line: #c9cdd4;
-  --accent: #bf3f00;
-  --accent-dark: #9a3200;
-  --accent-wash: #fbe9df;
+  /* colour */
+  --bg-page: #f2f3f5;
+  --surface: #ffffff;
+  --surface-sunken: #e8eaed;
+  --text-primary: #15181d;
+  --text-secondary: #4b5260;      /* legacy */
+  --text-muted: #5b6270;          /* legacy */
+  --border-color: #d5d9df;        /* legacy */
+  --border-strong: #9aa1ad;
+  --accent-primary: #b3261e;      /* legacy */
+  --accent-hover: #8f1d17;
+  --on-accent: #ffffff;
+
+  /* type */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+
+  --text-xs: 0.75rem;    /* 12 */
+  --text-sm: 0.875rem;   /* 14 */
+  --text-md: 1rem;       /* 16 */
+  --text-lg: 1.125rem;   /* 18 */
+  --text-xl: 1.5rem;     /* 24 */
+  --text-2xl: 2rem;      /* 32 */
+  --text-3xl: 2.5rem;    /* 40 */
+
+  /* spacing: 4px base, nothing outside this list */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-12: 48px;
+  --s-16: 64px;
+
+  /* radius steps up with the size of the thing */
+  --radius-control: 4px;
+  --radius-card: 8px;
+  --radius-dialog: 12px;
+
+  --tap-target: 44px;
 }
 
-* {
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+body,
+h1, h2, h3, p {
   margin: 0;
-  padding: 0;
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.6;
-  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font: 400 var(--text-md)/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
 }
 
-button,
-input {
-  font: inherit;
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
-
-h1,
-h2,
-h3 {
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
-
-h1 { font-size: 3rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.2rem; }
-
-p { text-wrap: pretty; }
 
 a {
   color: inherit;
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Layout
+   -------------------------------------------------------------------------- */
 .container {
   max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 24px;
+  margin-inline: auto;
+  padding-inline: var(--s-6);
 }
 
 header {
-  background: #fff;
-  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 70px;
+  gap: var(--s-4);
+  min-height: var(--s-16);
 }
 
+/* nav already gets display:flex and gap from inline style */
+header nav {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: var(--s-2);
+}
+
+.drops-section {
+  padding-block: var(--s-8) var(--s-12);
+}
+
+.events-grid,
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--s-6);
+}
+
+.page-header {
+  padding-block: var(--s-8);
+  margin-bottom: var(--s-8);
+  border-bottom: 1px solid var(--border-color);
+}
+
+
+/* --------------------------------------------------------------------------
+   Components
+   -------------------------------------------------------------------------- */
+
+/* brand + nav links */
 .brand-logo {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font: 800 var(--text-xl)/1 var(--font-display);
+  letter-spacing: -0.03em;
 }
 
-.brand-logo:hover { text-decoration: none; }
-
-nav {
-  display: flex;
-  align-items: center;
-  gap: 26px;
+header nav > .nav-link {
+  padding-block: var(--s-1);
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-underline-offset: var(--s-2);
+  text-decoration-thickness: 2px;
+  text-decoration-color: transparent;
+  transition: color 120ms;
 }
 
-.nav-link {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  padding: 3px 0;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
+header nav > .nav-link:hover {
+  color: var(--text-primary);
 }
 
-.nav-link:hover {
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom-color: var(--line);
-}
-
-.nav-link.active {
-  color: var(--ink);
-  font-weight: 600;
-  border-bottom-color: var(--accent);
-}
-
+/* buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 9px 22px;
-  border: 1px solid var(--accent);
-  border-radius: 3px;
+  min-height: var(--tap-target);
+  padding: 0 var(--s-4);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-control);
+  background: var(--accent-primary);
+  color: var(--on-accent);
+  font: 600 var(--text-md)/1 var(--font-body);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background-color 120ms, border-color 120ms;
 }
 
 .btn:hover {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
-  text-decoration: none;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
-.btn-secondary,
-.btn-signin {
+.btn-secondary {
   background: transparent;
-  color: var(--ink);
-  border-color: var(--ink);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
-.btn-secondary:hover,
-.btn-signin:hover {
-  background: #e4e6ea;
-  border-color: var(--ink);
+.btn-secondary:hover {
+  background: var(--surface-sunken);
+  border-color: var(--border-strong);
 }
 
+/* label on an event card: how much Fan Score you need */
 .badge {
   align-self: flex-start;
-  background: var(--accent-wash);
-  color: var(--accent-dark);
-  font-size: 0.78rem;
+  padding: var(--s-1) var(--s-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
   font-weight: 600;
-  padding: 2px 9px;
-  border-radius: 2px;
+  line-height: 1.33;
 }
 
+/* hero */
 .hero {
-  padding: 64px 0 28px;
-  max-width: 44rem;
+  max-width: 720px;
+  padding-block: var(--s-16) var(--s-8);
 }
 
-.hero h1 { margin-bottom: 14px; }
+.hero h1 {
+  margin-bottom: var(--s-4);
+  font-size: var(--text-3xl);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
 
 .hero p {
-  color: var(--ink-soft);
-  font-size: 1.2rem;
+  max-width: 56ch;
+  margin-bottom: var(--s-6);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
 }
 
-.events-section { padding: 36px 0; }
-.events-section h2 { margin-bottom: 22px; }
-
-.events-grid,
-.features-grid,
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 20px;
+.drops-section h2 {
+  margin-bottom: var(--s-6);
+  font-size: var(--text-2xl);
 }
 
-.event-card,
-.feature-card,
-.about-card,
-.stat-card {
+/* event card, drawn as a ticket: the price row sits below a
+   perforation, with a notch cut into each side of the card */
+.event-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 22px;
-  transition: border-color 0.2s;
+  gap: var(--s-2);
+  padding: var(--s-6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  background: var(--surface);
 }
 
-.event-card:hover,
-.feature-card:hover,
-.about-card:hover,
-.stat-card:hover {
-  border-color: var(--ink);
+.event-card h3 {
+  margin-top: var(--s-2);
+  font-size: var(--text-xl);
 }
 
 .event-details {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 
 .price {
-  font-size: 1.2rem;
+  position: relative;
+  margin-block: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px dashed var(--border-strong);
+  font-size: var(--text-lg);
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  margin: 6px 0 10px;
+}
+
+.price::before,
+.price::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--s-2) * -1);
+  width: var(--s-4);
+  height: var(--s-4);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-page);
+}
+
+/* card padding + border, minus half the notch, keeps it on the card edge */
+.price::before {
+  left: calc((var(--s-6) + 1px + var(--s-2)) * -1);
+  clip-path: inset(0 0 0 50%);
+}
+
+.price::after {
+  right: calc((var(--s-6) + 1px + var(--s-2)) * -1);
+  clip-path: inset(0 50% 0 0);
 }
 
 .price small {
-  color: var(--ink-faint);
-  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
   font-weight: 400;
 }
 
-.qty-control {
-  display: inline-flex;
+.reserve-btn {
+  margin-top: auto;
+}
+
+/* feature blocks: open layout with a rule on top, so they read
+   differently from the ticket cards */
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding-top: var(--s-4);
+  border-top: 2px solid var(--text-primary);
+}
+
+.feature-card h3 {
+  font-size: var(--text-xl);
+}
+
+.feature-card p {
+  color: var(--text-secondary);
+}
+
+/* page headers */
+.page-header h2 {
+  margin-bottom: var(--s-2);
+  font-size: var(--text-2xl);
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+}
+
+/* my tickets */
+.tickets-container {
+  min-height: 256px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.qty-btn {
-  min-width: 38px;
-  height: 38px;
-  padding: 0 8px;
-  background: transparent;
-  color: var(--ink);
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: 1px solid var(--ink);
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.qty-btn:hover { background: #e4e6ea; }
-
-.qty-value {
-  min-width: 36px;
+  justify-content: center;
+  gap: var(--s-4);
+  padding: var(--s-16) var(--s-6);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  color: var(--text-secondary);
   text-align: center;
+}
+
+/* modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--s-4);
+  background: rgba(21, 24, 29, 0.6);
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: var(--s-8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-dialog);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(21, 24, 29, 0.16);
+  text-align: center;
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+  display: grid;
+  place-items: center;
+  width: var(--tap-target);
+  height: var(--tap-target);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--text-xl);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+.modal-icon {
+  margin-bottom: var(--s-2);
+  font-size: var(--text-3xl);
+  line-height: 1;
+}
+
+.modal-card h3 {
+  margin-bottom: var(--s-2);
+  font-size: var(--text-xl);
+}
+
+.modal-card p {
+  margin-bottom: var(--s-6);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.modal-actions {
+  display: flex;
+}
+
+
+/* --------------------------------------------------------------------------
+   States
+   Classes that app.js toggles. Nothing else in this file should depend on
+   them, so the script can change without touching the components above.
+   -------------------------------------------------------------------------- */
+.page-view {
+  display: none;
+}
+
+.page-view.active-page {
+  display: block;
+}
+
+header nav > .nav-link.active {
+  color: var(--text-primary);
+  text-decoration-line: underline;
+  text-decoration-color: var(--accent-primary);
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.btn:disabled {
+  border-color: var(--border-color);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .container {
+    padding-inline: var(--s-4);
+  }
+
+  .header-inner {
+    padding-block: var(--s-3);
+  }
+
+  .hero {
+    padding-top: var(--s-8);
+  }
+
+  .hero h1 {
+    font-size: var(--text-2xl);
+  }
 }
