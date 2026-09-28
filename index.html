@@ -11,7 +11,515 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
-  <link rel="stylesheet" href="style.css?v=6">
+  <style>
+    /* ==========================================================================
+       FanFirst
+       Structure: tokens > base > layout > components > states > responsive
+       Rule of thumb: components describe how things look; anything that changes
+       with JS (.active, .active-page, .hidden) lives in the states section.
+       ========================================================================== */
+
+
+    /* --------------------------------------------------------------------------
+       Tokens
+       The four names marked "legacy" are read by inline styles in index.html.
+       -------------------------------------------------------------------------- */
+    :root {
+      /* colour */
+      --bg-page: #f2f3f5;
+      --surface: #ffffff;
+      --surface-sunken: #e8eaed;
+      --text-primary: #15181d;
+      --text-secondary: #4b5260;      /* legacy */
+      --text-muted: #5b6270;          /* legacy */
+      --border-color: #d5d9df;        /* legacy */
+      --border-strong: #9aa1ad;
+      --accent-primary: #b3261e;      /* legacy */
+      --accent-hover: #8f1d17;
+      --on-accent: #ffffff;
+      --positive: #17663c;
+
+      /* type */
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Space Grotesk', sans-serif;
+
+      --text-xs: 0.75rem;    /* 12 */
+      --text-sm: 0.875rem;   /* 14 */
+      --text-md: 1rem;       /* 16 */
+      --text-lg: 1.125rem;   /* 18 */
+      --text-xl: 1.5rem;     /* 24 */
+      --text-2xl: 2rem;      /* 32 */
+      --text-3xl: 2.5rem;    /* 40 */
+
+      /* spacing: 4px base, nothing outside this list */
+      --s-1: 4px;
+      --s-2: 8px;
+      --s-3: 12px;
+      --s-4: 16px;
+      --s-6: 24px;
+      --s-8: 32px;
+      --s-12: 48px;
+      --s-16: 64px;
+
+      /* radius steps up with the size of the thing */
+      --radius-control: 4px;
+      --radius-card: 8px;
+      --radius-dialog: 12px;
+
+      --tap-target: 44px;
+    }
+
+
+    /* --------------------------------------------------------------------------
+       Base
+       -------------------------------------------------------------------------- */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body,
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font: 400 var(--text-md)/1.5 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+
+
+    /* --------------------------------------------------------------------------
+       Layout
+       -------------------------------------------------------------------------- */
+    .container {
+      max-width: 1120px;
+      margin-inline: auto;
+      padding-inline: var(--s-6);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--s-4);
+      min-height: var(--s-16);
+    }
+
+    /* nav already gets display:flex and gap from inline style */
+    header nav {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      row-gap: var(--s-2);
+    }
+
+    .drops-section {
+      padding-block: var(--s-8) var(--s-12);
+    }
+
+    .events-grid,
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+      gap: var(--s-6);
+    }
+
+    .page-header {
+      padding-block: var(--s-8);
+      margin-bottom: var(--s-8);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+
+    /* --------------------------------------------------------------------------
+       Components
+       -------------------------------------------------------------------------- */
+
+    /* brand + nav links */
+    .brand-logo {
+      font: 800 var(--text-xl)/1 var(--font-display);
+      letter-spacing: -0.03em;
+    }
+
+    header nav > .nav-link {
+      padding-block: var(--s-1);
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-underline-offset: var(--s-2);
+      text-decoration-thickness: 2px;
+      text-decoration-color: transparent;
+      transition: color 120ms;
+    }
+
+    header nav > .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    /* buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--tap-target);
+      padding: 0 var(--s-4);
+      border: 1px solid var(--accent-primary);
+      border-radius: var(--radius-control);
+      background: var(--accent-primary);
+      color: var(--on-accent);
+      font: 600 var(--text-md)/1 var(--font-body);
+      cursor: pointer;
+      transition: background-color 120ms, border-color 120ms;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-sunken);
+      border-color: var(--border-strong);
+    }
+
+    .btn-small {
+      min-height: var(--s-8);
+      padding: 0 var(--s-2);
+      font-size: var(--text-sm);
+    }
+
+    /* logged-in bar, rendered by app.js */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: var(--s-2);
+    }
+
+    .user-name {
+      margin-inline: var(--s-1);
+      font-weight: 600;
+    }
+
+    /* label on an event card: how much Fan Score you need */
+    .badge {
+      align-self: flex-start;
+      padding: var(--s-1) var(--s-2);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-control);
+      color: var(--text-primary);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      line-height: 1.33;
+    }
+
+    /* hero */
+    .hero {
+      max-width: 720px;
+      padding-block: var(--s-16) var(--s-8);
+    }
+
+    .hero h1 {
+      margin-bottom: var(--s-4);
+      font-size: var(--text-3xl);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      max-width: 56ch;
+      margin-bottom: var(--s-6);
+      color: var(--text-secondary);
+      font-size: var(--text-lg);
+    }
+
+    .drops-section h2 {
+      margin-bottom: var(--s-6);
+      font-size: var(--text-2xl);
+    }
+
+    /* event card, drawn as a ticket: the price row sits below a
+       perforation, with a notch cut into each side of the card */
+    .event-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+      padding: var(--s-6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      background: var(--surface);
+    }
+
+    .event-card h3 {
+      margin-top: var(--s-2);
+      font-size: var(--text-xl);
+    }
+
+    .event-details {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    .price {
+      position: relative;
+      margin-block: var(--s-3);
+      padding-top: var(--s-4);
+      border-top: 1px dashed var(--border-strong);
+      font-size: var(--text-lg);
+      font-weight: 600;
+    }
+
+    .price::before,
+    .price::after {
+      content: "";
+      position: absolute;
+      top: calc(var(--s-2) * -1);
+      width: var(--s-4);
+      height: var(--s-4);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      background: var(--bg-page);
+    }
+
+    /* card padding + border, minus half the notch, keeps it on the card edge */
+    .price::before {
+      left: calc((var(--s-6) + 1px + var(--s-2)) * -1);
+      clip-path: inset(0 0 0 50%);
+    }
+
+    .price::after {
+      right: calc((var(--s-6) + 1px + var(--s-2)) * -1);
+      clip-path: inset(0 50% 0 0);
+    }
+
+    .price small {
+      color: var(--text-muted);
+      font-size: var(--text-xs);
+      font-weight: 400;
+    }
+
+    .reserve-btn {
+      margin-top: auto;
+    }
+
+    /* feature blocks: open layout with a rule on top, so they read
+       differently from the ticket cards */
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+      padding-top: var(--s-4);
+      border-top: 2px solid var(--text-primary);
+    }
+
+    .feature-card h3 {
+      font-size: var(--text-xl);
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+    }
+
+    /* page headers */
+    .page-header h2 {
+      margin-bottom: var(--s-2);
+      font-size: var(--text-2xl);
+    }
+
+    .page-header p {
+      color: var(--text-secondary);
+      font-size: var(--text-lg);
+    }
+
+    /* my tickets */
+    .tickets-container {
+      min-height: 256px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s-4);
+      padding: var(--s-16) var(--s-6);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-card);
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: var(--s-4);
+      background: rgba(21, 24, 29, 0.6);
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      padding: var(--s-8);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-dialog);
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(21, 24, 29, 0.16);
+      text-align: center;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: var(--s-2);
+      right: var(--s-2);
+      display: grid;
+      place-items: center;
+      width: var(--tap-target);
+      height: var(--tap-target);
+      border: 0;
+      border-radius: var(--radius-control);
+      background: none;
+      color: var(--text-secondary);
+      font-size: var(--text-xl);
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background: var(--surface-sunken);
+      color: var(--text-primary);
+    }
+
+    .modal-icon {
+      margin-bottom: var(--s-2);
+      font-size: var(--text-3xl);
+      line-height: 1;
+    }
+
+    .modal-icon--success {
+      color: var(--positive);
+    }
+
+    .modal-icon--error {
+      color: var(--accent-primary);
+    }
+
+    .empty-state-icon {
+      color: var(--text-muted);
+      font-size: var(--s-12);
+    }
+
+    .modal-card h3 {
+      margin-bottom: var(--s-2);
+      font-size: var(--text-xl);
+    }
+
+    .modal-card p {
+      margin-bottom: var(--s-6);
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    .modal-actions {
+      display: flex;
+    }
+
+
+    /* --------------------------------------------------------------------------
+       States
+       Classes that app.js toggles. Nothing else in this file should depend on
+       them, so the script can change without touching the components above.
+       -------------------------------------------------------------------------- */
+    .page-view {
+      display: none;
+    }
+
+    .page-view.active-page {
+      display: block;
+    }
+
+    header nav > .nav-link.active {
+      color: var(--text-primary);
+      text-decoration-line: underline;
+      text-decoration-color: var(--accent-primary);
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .btn:disabled {
+      border-color: var(--border-color);
+      background: var(--surface-sunken);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+
+    /* --------------------------------------------------------------------------
+       Responsive
+       -------------------------------------------------------------------------- */
+    @media (max-width: 600px) {
+      .container {
+        padding-inline: var(--s-4);
+      }
+
+      .header-inner {
+        padding-block: var(--s-3);
+      }
+
+      .hero {
+        padding-top: var(--s-8);
+      }
+
+      .hero h1 {
+        font-size: var(--text-2xl);
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -160,6 +668,422 @@
 </div>
 
 <!-- SCRIPT -->
-<script src="fanfirst.js?v=6"></script>
+<script>
+  'use strict';
+
+  /* ==========================================================================
+     FanFirst
+     Sections: constants > domain (pure, no DOM) > templates (pure) > DOM app
+     Everything above the "DOM app" section can run in Node and be unit tested.
+     ========================================================================== */
+
+
+  /* --------------------------------------------------------------------------
+     Constants
+     -------------------------------------------------------------------------- */
+  const FAN_SCORE = Object.freeze({ initial: 100, step: 10, min: 0 });
+
+  const RESERVE_BUTTON_LABEL = Object.freeze({
+    available: 'Reserve Ticket',
+    reserved: 'Reserved ✓',
+  });
+
+  const ReservationOutcome = Object.freeze({
+    RESERVED: 'reserved',
+    LOGIN_REQUIRED: 'login_required',
+    SCORE_TOO_LOW: 'score_too_low',
+    ALREADY_RESERVED: 'already_reserved',
+  });
+
+  const HTML_ESCAPES = Object.freeze({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  });
+
+
+  /* --------------------------------------------------------------------------
+     Domain: state and rules. No DOM access in this section.
+     -------------------------------------------------------------------------- */
+
+  /** Success / failure wrappers so callers must check `ok` before using a value. */
+  const succeed = (value) => ({ ok: true, value });
+  const fail = (message) => ({ ok: false, error: new Error(message) });
+
+  function createInitialState() {
+    return {
+      isLoggedIn: false,
+      user: { name: 'Alex', fanScore: FAN_SCORE.initial },
+      reservedTickets: [],
+    };
+  }
+
+  const toggleLogin = (state) => ({ ...state, isLoggedIn: !state.isLoggedIn });
+
+  /**
+   * Returns a new state with the fan score moved by `delta`, never below the minimum.
+   * @throws {TypeError} if `delta` is not a finite number
+   */
+  function adjustFanScore(state, delta) {
+    if (!Number.isFinite(delta)) {
+      throw new TypeError(`Fan score change must be a finite number, received ${delta}`);
+    }
+    const fanScore = Math.max(FAN_SCORE.min, state.user.fanScore + delta);
+    return { ...state, user: { ...state.user, fanScore } };
+  }
+
+  /**
+   * Pulls the minimum fan score out of badge text such as "Req. Fan Score: 80+".
+   * @param {string | null | undefined} badgeText
+   * @returns {{ok: true, value: number} | {ok: false, error: Error}}
+   */
+  function parseRequiredFanScore(badgeText) {
+    const match = /(\d+)/.exec(badgeText ?? '');
+    return match
+      ? succeed(Number.parseInt(match[1], 10))
+      : fail(`No fan score requirement found in "${badgeText}"`);
+  }
+
+  const isEventReserved = (state, event) =>
+    state.reservedTickets.some((ticket) => ticket.title === event.title);
+
+  /**
+   * Decides what happens when the current user tries to reserve `event`.
+   * Pure: it reports the outcome and leaves applying it to the caller.
+   * @param {ReturnType<typeof createInitialState>} state
+   * @param {{title: string, requiredFanScore: number}} event
+   * @returns {string} one of ReservationOutcome
+   */
+  function decideReservation(state, event) {
+    if (!state.isLoggedIn) return ReservationOutcome.LOGIN_REQUIRED;
+    if (isEventReserved(state, event)) return ReservationOutcome.ALREADY_RESERVED;
+    return state.user.fanScore >= event.requiredFanScore
+      ? ReservationOutcome.RESERVED
+      : ReservationOutcome.SCORE_TOO_LOW;
+  }
+
+  function addReservation(state, { title, details, price }) {
+    return {
+      ...state,
+      reservedTickets: [...state.reservedTickets, { title, details, price }],
+    };
+  }
+
+  /** Auth-bar buttons, each mapped to the state change it triggers. */
+  const AUTH_ACTIONS = Object.freeze({
+    login: toggleLogin,
+    logout: toggleLogin,
+    'score-up': (state) => adjustFanScore(state, FAN_SCORE.step),
+    'score-down': (state) => adjustFanScore(state, -FAN_SCORE.step),
+  });
+
+  const GENERIC_ERROR_MESSAGE = Object.freeze({
+    title: 'Something Went Wrong',
+    message: "We couldn't read this event's details, so it can't be reserved right now.",
+    icon: 'error',
+    tone: 'error',
+  });
+
+  const OUTCOME_MESSAGES = Object.freeze({
+    [ReservationOutcome.LOGIN_REQUIRED]: () => ({
+      title: 'Authentication Required',
+      message: 'Please log in to your FanFirst account to participate in fair-access ticket drops.',
+      icon: 'lock',
+      tone: 'error',
+    }),
+    [ReservationOutcome.RESERVED]: ({ event, fanScore }) => ({
+      title: 'Ticket Reserved!',
+      message:
+        `Success! Your Fan Score of ${fanScore} meets the ${event.requiredFanScore}+ ` +
+        `requirement for "${event.title}". Your face-value ticket has been reserved.`,
+      icon: 'check_circle',
+      tone: 'success',
+    }),
+    [ReservationOutcome.SCORE_TOO_LOW]: ({ event, fanScore }) => ({
+      title: 'Access Restricted',
+      message:
+        `"${event.title}" requires a minimum Fan Score of ${event.requiredFanScore}+. ` +
+        `Your current Fan Score is ${fanScore}.`,
+      icon: 'block',
+      tone: 'error',
+    }),
+    [ReservationOutcome.ALREADY_RESERVED]: ({ event }) => ({
+      title: 'Already Reserved',
+      message: `You already hold a ticket for "${event.title}".`,
+      icon: 'confirmation_number',
+      tone: 'success',
+    }),
+  });
+
+  /**
+   * Builds the modal content for a reservation outcome.
+   * @throws {Error} if the outcome is not a known ReservationOutcome
+   */
+  function describeOutcome(outcome, context) {
+    if (!Object.hasOwn(OUTCOME_MESSAGES, outcome)) {
+      throw new Error(`Unhandled reservation outcome "${outcome}"`);
+    }
+    return OUTCOME_MESSAGES[outcome](context);
+  }
+
+
+  /* --------------------------------------------------------------------------
+     Templates: state in, HTML string out.
+     -------------------------------------------------------------------------- */
+  const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+
+  function loggedOutTemplate() {
+    return `<button type="button" class="btn" data-action="login">Login / Sign Up</button>`;
+  }
+
+  function loggedInTemplate({ user }) {
+    const step = FAN_SCORE.step;
+    return `
+    <div class="user-profile">
+      <span class="badge" id="user-score-badge">Fan Score: ${user.fanScore}</span>
+      <button type="button" class="btn btn-secondary btn-small" data-action="score-down"
+              aria-label="Lower Fan Score by ${step}">-${step}</button>
+      <button type="button" class="btn btn-secondary btn-small" data-action="score-up"
+              aria-label="Raise Fan Score by ${step}">+${step}</button>
+      <span class="user-name">${escapeHtml(user.name)}</span>
+      <button type="button" class="btn btn-secondary btn-small" data-action="logout">Logout</button>
+    </div>`;
+  }
+
+  const authTemplate = (state) => (state.isLoggedIn ? loggedInTemplate(state) : loggedOutTemplate());
+
+  function emptyTicketsTemplate() {
+    return `
+    <div class="empty-state">
+      <span class="material-symbols-outlined empty-state-icon">confirmation_number</span>
+      <p>You haven't reserved any tickets yet.</p>
+      <a href="#" class="btn btn-secondary nav-link" data-page="home">Explore Drops</a>
+    </div>`;
+  }
+
+  const reservedTicketTemplate = ({ title, details, price }) => `
+  <div class="event-card">
+    <div class="badge">Confirmed</div>
+    <h3>${escapeHtml(title)}</h3>
+    <p class="event-details">${escapeHtml(details)}</p>
+    <p class="price">${escapeHtml(price)}</p>
+    <button type="button" class="btn btn-secondary" disabled>${RESERVE_BUTTON_LABEL.reserved}</button>
+  </div>`;
+
+  function ticketsTemplate(reservedTickets) {
+    if (reservedTickets.length === 0) return emptyTicketsTemplate();
+    return `<div class="events-grid">${reservedTickets.map(reservedTicketTemplate).join('')}</div>`;
+  }
+
+
+  /* --------------------------------------------------------------------------
+     DOM app: reads the page, renders state, wires events.
+     -------------------------------------------------------------------------- */
+
+  /** @throws {Error} naming the id if a required element is missing */
+  function requireElement(doc, id) {
+    const element = doc.getElementById(id);
+    if (!element) throw new Error(`Missing required element #${id}`);
+    return element;
+  }
+
+  /**
+   * Reads an event's details from its card in the page.
+   * @param {Element | null} card an `.event-card` element
+   * @returns {{ok: true, value: {title: string, details: string, price: string, requiredFanScore: number}}
+   *         | {ok: false, error: Error}}
+   */
+  function readEventFromCard(card) {
+    if (!card) return fail('Reserve button is not inside an event card');
+
+    const title = card.querySelector('h3')?.textContent.trim();
+    const details = card.querySelector('.event-details')?.textContent.trim();
+    // The price element also holds a <small> note, so only its first text node is the price.
+    const price = card.querySelector('.price')?.firstChild?.textContent.trim();
+    if (!title || !details || !price) {
+      return fail('Event card is missing its title, details or price');
+    }
+
+    const requiredScore = parseRequiredFanScore(card.querySelector('.badge')?.textContent);
+    if (!requiredScore.ok) return requiredScore;
+
+    return succeed({ title, details, price, requiredFanScore: requiredScore.value });
+  }
+
+  /** Controls the modal dialog and returns focus to whatever opened it. */
+  function createModal(doc) {
+    const overlay = requireElement(doc, 'modal-overlay');
+    const closeButton = requireElement(doc, 'modal-close-btn');
+    const actionButton = requireElement(doc, 'modal-action-btn');
+    const titleElement = requireElement(doc, 'modal-title');
+    const messageElement = requireElement(doc, 'modal-message');
+    const iconElement = requireElement(doc, 'modal-status-icon');
+
+    let elementToRefocus = null;
+    const isOpen = () => !overlay.classList.contains('hidden');
+
+    function close() {
+      if (!isOpen()) return;
+      overlay.classList.add('hidden');
+      elementToRefocus?.focus();
+      elementToRefocus = null;
+    }
+
+    function open({ title, message, icon, tone }) {
+      if (!isOpen()) elementToRefocus = doc.activeElement;
+      titleElement.textContent = title;
+      messageElement.textContent = message;
+      iconElement.textContent = icon;
+      iconElement.className = `modal-icon material-symbols-outlined modal-icon--${tone}`;
+      overlay.classList.remove('hidden');
+      actionButton.focus();
+    }
+
+    closeButton.addEventListener('click', close);
+    actionButton.addEventListener('click', close);
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) close();
+    });
+    doc.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') close();
+    });
+
+    return { open, close };
+  }
+
+  /**
+   * Wires the whole page: navigation, auth bar, reservations and My Tickets.
+   * @param {Document} doc
+   * @param {ReturnType<typeof createInitialState>} [initialState]
+   */
+  function createApp(doc, initialState = createInitialState()) {
+    const authContainer = requireElement(doc, 'auth-container');
+    const ticketsList = requireElement(doc, 'tickets-list');
+    const modal = createModal(doc);
+
+    let state = initialState;
+
+    function setState(transform) {
+      state = transform(state);
+      render();
+    }
+
+    /* rendering */
+
+    function renderAuth() {
+      const focusedAction = authContainer.contains(doc.activeElement)
+        ? doc.activeElement.dataset.action
+        : null;
+
+      authContainer.innerHTML = authTemplate(state);
+
+      // Re-rendering replaces the buttons, so give focus back to the one that was in use.
+      if (focusedAction) {
+        authContainer.querySelector(`[data-action="${focusedAction}"]`)?.focus();
+      }
+    }
+
+    function renderReserveButtons() {
+      doc.querySelectorAll('.reserve-btn').forEach((button) => {
+        const title = button.closest('.event-card')?.querySelector('h3')?.textContent.trim();
+        const isReserved = state.reservedTickets.some((ticket) => ticket.title === title);
+        button.disabled = isReserved;
+        button.textContent = isReserved
+          ? RESERVE_BUTTON_LABEL.reserved
+          : RESERVE_BUTTON_LABEL.available;
+      });
+    }
+
+    function render() {
+      renderAuth();
+      renderReserveButtons();
+      ticketsList.innerHTML = ticketsTemplate(state.reservedTickets);
+    }
+
+    /* navigation */
+
+    /** @throws {Error} if no page exists for `pageId` */
+    function showPage(pageId) {
+      const targetPage = doc.getElementById(`page-${pageId}`);
+      if (!targetPage) throw new Error(`Unknown page "${pageId}"`);
+
+      doc.querySelectorAll('.page-view').forEach((page) => {
+        page.classList.toggle('active-page', page === targetPage);
+      });
+      doc.querySelectorAll('.nav-link').forEach((link) => {
+        link.classList.toggle('active', link.dataset.page === pageId);
+      });
+    }
+
+    /* reservations */
+
+    function reserveFromButton(button) {
+      const eventResult = readEventFromCard(button.closest('.event-card'));
+      if (!eventResult.ok) {
+        modal.open(GENERIC_ERROR_MESSAGE);
+        throw eventResult.error;
+      }
+
+      const event = eventResult.value;
+      const outcome = decideReservation(state, event);
+
+      if (outcome === ReservationOutcome.RESERVED) {
+        setState((current) => addReservation(current, event));
+      }
+      modal.open(describeOutcome(outcome, { event, fanScore: state.user.fanScore }));
+    }
+
+    /* events */
+
+    authContainer.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element)) return;
+      const action = event.target.closest('[data-action]')?.dataset.action;
+      if (Object.hasOwn(AUTH_ACTIONS, action)) setState(AUTH_ACTIONS[action]);
+    });
+
+    doc.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element)) return;
+      const reserveButton = event.target.closest('.reserve-btn');
+      if (reserveButton) {
+        reserveFromButton(reserveButton);
+        return;
+      }
+
+      const navLink = event.target.closest('.nav-link[data-page]');
+      if (navLink) {
+        event.preventDefault();
+        showPage(navLink.dataset.page);
+      }
+    });
+
+    render();
+  }
+
+
+  /* --------------------------------------------------------------------------
+     Start-up and exports
+     -------------------------------------------------------------------------- */
+  if (typeof document !== 'undefined') {
+    createApp(document);
+  }
+
+  // Lets the pure logic be required from a test runner; ignored in the browser.
+  if (typeof module !== 'undefined') {
+    module.exports = {
+      FAN_SCORE,
+      ReservationOutcome,
+      createInitialState,
+      toggleLogin,
+      adjustFanScore,
+      parseRequiredFanScore,
+      decideReservation,
+      addReservation,
+      describeOutcome,
+      ticketsTemplate,
+    };
+  }
+</script>
 </body>
 </html>
