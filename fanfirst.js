@@ -1,118 +1,96 @@
-// 1. APPLICATION STATE
 const state = {
   isLoggedIn: false,
-  user: {
-    name: "Alex",
-    fanScore: 100
-  },
-  reservedTickets: []
+  user: { name: 'Alex', fanScore: 100 },
+  reservedTickets: [],
 };
 
 window.state = state;
 
+const SCORE_STEP = 10;
+
+const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+
+
 // 2. DOM ELEMENT SELECTORS
 const authContainer = document.getElementById('auth-container');
-const reserveBtns = document.querySelectorAll('.reserve-btn');
 const ticketsList = document.getElementById('tickets-list');
 
-// MODAL DOM ELEMENTS
 const modalOverlay = document.getElementById('modal-overlay');
-const modalCloseBtn = document.getElementById('modal-close-btn');
-const modalActionBtn = document.getElementById('modal-action-btn');
 const modalTitle = document.getElementById('modal-title');
 const modalMessage = document.getElementById('modal-message');
 const modalIcon = document.getElementById('modal-status-icon');
 
+
 // 3. NAVIGATION ROUTER
 function navigateToPage(targetPageId) {
-  const pageViews = document.querySelectorAll('.page-view');
-  const navLinks = document.querySelectorAll('.nav-link');
-
-  // Hide all page views
-  pageViews.forEach(page => page.classList.remove('active-page'));
-
-  // Show target page view
   const targetPage = document.getElementById(`page-${targetPageId}`);
-  if (targetPage) {
-    targetPage.classList.add('active-page');
-  }
 
-  // Update active state on navigation links
-  navLinks.forEach(link => {
-    if (link.dataset.page === targetPageId) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
-    }
+  document.querySelectorAll('.page-view').forEach((page) => {
+    page.classList.toggle('active-page', page === targetPage);
+  });
+  document.querySelectorAll('.nav-link').forEach((link) => {
+    link.classList.toggle('active', link.dataset.page === targetPageId);
   });
 
-  // Refresh My Tickets if navigating to that page
-  if (targetPageId === 'my-tickets') {
-    renderMyTickets();
-  }
+  // Refresh My Tickets whenever the page is opened
+  if (targetPageId === 'my-tickets') renderMyTickets();
 }
 
-// Event Delegation for Navigation Links
-document.addEventListener('click', (e) => {
-  const navLink = e.target.closest('.nav-link');
-  if (navLink && navLink.dataset.page) {
-    e.preventDefault();
-    navigateToPage(navLink.dataset.page);
-  }
-});
 
 // 4. UI RENDER FUNCTIONS
+const OUTLINE_BUTTON_STYLE =
+  'background: transparent; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;';
+
+const outlineButton = (id, label, style) =>
+  `<button id="${id}" style="${OUTLINE_BUTTON_STYLE} ${style}">${label}</button>`;
+
+const SCORE_BUTTON_STYLE = 'padding: 2px 6px; font-size: 0.75rem; color: var(--text-primary);';
+const LOGOUT_BUTTON_STYLE =
+  'padding: 4px 8px; font-size: 0.8rem; color: var(--text-secondary); margin-left: 4px;';
+
+const loggedInTemplate = ({ user }) => `
+  <div class="user-profile" style="display: flex; align-items: center; gap: 8px;">
+    <span class="badge" id="user-score-badge">Fan Score: ${user.fanScore}</span>
+    ${outlineButton('score-down-btn', `-${SCORE_STEP}`, SCORE_BUTTON_STYLE)}
+    ${outlineButton('score-up-btn', `+${SCORE_STEP}`, SCORE_BUTTON_STYLE)}
+    <span style="font-weight: 600; margin-left: 4px;">${escapeHtml(user.name)}</span>
+    ${outlineButton('logout-btn', 'Logout', LOGOUT_BUTTON_STYLE)}
+  </div>
+`;
+
+const loggedOutTemplate = () => `<button id="login-btn" class="btn">Login / Sign Up</button>`;
+
 function renderAuthUI() {
-  if (state.isLoggedIn) {
-    authContainer.innerHTML = `
-      <div class="user-profile" style="display: flex; align-items: center; gap: 8px;">
-        <span class="badge" id="user-score-badge">Fan Score: ${state.user.fanScore}</span>
-        <button id="score-down-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white; cursor: pointer;">-10</button>
-        <button id="score-up-btn" style="padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: transparent; color: white; cursor: pointer;">+10</button>
-        <span style="font-weight: 600; margin-left: 4px;">${state.user.name}</span>
-        <button id="logout-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 4px; cursor: pointer;">Logout</button>
-      </div>
-    `;
-
-    document.getElementById('logout-btn').addEventListener('click', toggleAuth);
-    document.getElementById('score-up-btn').addEventListener('click', () => updateScore(10));
-    document.getElementById('score-down-btn').addEventListener('click', () => updateScore(-10));
-  } else {
-    authContainer.innerHTML = `
-      <button id="login-btn" class="btn">Login / Sign Up</button>
-    `;
-
-    document.getElementById('login-btn').addEventListener('click', toggleAuth);
-  }
+  authContainer.innerHTML = state.isLoggedIn ? loggedInTemplate(state) : loggedOutTemplate();
 }
+
+const emptyTicketsTemplate = () => `
+  <div class="empty-state">
+    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted);">confirmation_number</span>
+    <p>You haven't reserved any tickets yet.</p>
+    <a href="#" class="btn btn-secondary nav-link" data-page="home">Explore Drops</a>
+  </div>
+`;
+
+const reservedTicketTemplate = ({ title, details, price }) => `
+  <div class="event-card">
+    <div class="badge">CONFIRMED RESERVATION</div>
+    <h3>${escapeHtml(title)}</h3>
+    <p class="event-details">${escapeHtml(details)}</p>
+    <p class="price">${escapeHtml(price)}</p>
+    <button class="btn btn-secondary" disabled>Reserved ✓</button>
+  </div>
+`;
 
 function renderMyTickets() {
   if (!ticketsList) return;
 
-  if (state.reservedTickets.length === 0) {
-    ticketsList.innerHTML = `
-      <div class="empty-state">
-        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted);">confirmation_number</span>
-        <p>You haven't reserved any tickets yet.</p>
-        <a href="#" class="btn btn-secondary nav-link" data-page="home">Explore Drops</a>
-      </div>
-    `;
-  } else {
-    ticketsList.innerHTML = `
-      <div class="events-grid">
-        ${state.reservedTickets.map(ticket => `
-          <div class="event-card">
-            <div class="badge">CONFIRMED RESERVATION</div>
-            <h3>${ticket.title}</h3>
-            <p class="event-details">${ticket.details}</p>
-            <p class="price">${ticket.price}</p>
-            <button class="btn btn-secondary" disabled>Reserved ✓</button>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
+  ticketsList.innerHTML = state.reservedTickets.length === 0
+    ? emptyTicketsTemplate()
+    : `<div class="events-grid">${state.reservedTickets.map(reservedTicketTemplate).join('')}</div>`;
 }
+
 
 // 5. AUTH & SCORE HANDLERS
 function toggleAuth() {
@@ -125,81 +103,104 @@ function updateScore(amount) {
   renderAuthUI();
 }
 
+// One listener for every auth-bar button; the bar is re-rendered, so it can't hold its own listeners.
+const AUTH_ACTIONS = new Map([
+  ['login-btn', toggleAuth],
+  ['logout-btn', toggleAuth],
+  ['score-up-btn', () => updateScore(SCORE_STEP)],
+  ['score-down-btn', () => updateScore(-SCORE_STEP)],
+]);
+
+authContainer.addEventListener('click', ({ target }) => {
+  AUTH_ACTIONS.get(target.closest('button')?.id)?.();
+});
+
+
 // 6. MODAL CONTROL HELPERS
-function showModal(title, message, iconSymbol, isSuccess = true) {
+function showModal({ title, message, icon, isSuccess = true }) {
   modalTitle.textContent = title;
   modalMessage.textContent = message;
-  modalIcon.textContent = iconSymbol;
-
-  if (isSuccess) {
-    modalIcon.style.color = "var(--accent-primary)";
-  } else {
-    modalIcon.style.color = "var(--accent-danger)";
-  }
-
+  modalIcon.textContent = icon;
+  modalIcon.style.color = isSuccess ? 'var(--accent-primary)' : 'var(--accent-danger)';
   modalOverlay.classList.remove('hidden');
 }
 
-function closeModal() {
-  modalOverlay.classList.add('hidden');
-}
+const closeModal = () => modalOverlay.classList.add('hidden');
 
-modalCloseBtn.addEventListener('click', closeModal);
-modalActionBtn.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal();
+// Close button, action button, or a click on the backdrop itself
+modalOverlay.addEventListener('click', ({ target }) => {
+  if (target === modalOverlay || target.closest('#modal-close-btn, #modal-action-btn')) {
+    closeModal();
+  }
 });
 
-// 7. TICKET RESERVATION LOGIC
-function handleReservation(event) {
-  const targetBtn = event.target;
 
+// 7. TICKET RESERVATION LOGIC
+function readEventCard(card) {
+  const text = (selector) => card.querySelector(selector).textContent;
+
+  return {
+    title: text('h3'),
+    details: text('.event-details'),
+    // .price also holds a <small> note, so only its first text node is the price
+    price: card.querySelector('.price').firstChild.textContent.trim(),
+    requiredScore: parseInt(text('.badge').replace(/\D/g, ''), 10),
+  };
+}
+
+function handleReservation(button) {
   if (!state.isLoggedIn) {
-    showModal(
-        "Authentication Required",
-        "Please log in to your FanFirst account to participate in fair-access ticket drops.",
-        "🔒",
-        false
-    );
+    showModal({
+      title: 'Authentication Required',
+      message: 'Please log in to your FanFirst account to participate in fair-access ticket drops.',
+      icon: '🔒',
+      isSuccess: false,
+    });
     return;
   }
 
-  const card = targetBtn.closest('.event-card');
-  const eventTitle = card.querySelector('h3').textContent;
-  const eventDetails = card.querySelector('.event-details').textContent;
-  const price = card.querySelector('.price').childNodes[0].textContent.trim();
-  const badgeText = card.querySelector('.badge').textContent;
-  const requiredScore = parseInt(badgeText.replace(/[^0-9]/g, ''), 10);
+  const { title: eventTitle, details, price, requiredScore } =
+    readEventCard(button.closest('.event-card'));
+  const { fanScore } = state.user;
 
-  if (state.user.fanScore >= requiredScore) {
-    state.reservedTickets.push({
-      title: eventTitle,
-      details: eventDetails,
-      price: price
+  // Kept as ">=" (not "<" with the branches swapped) so a missing score requirement (NaN) is denied
+  if (fanScore >= requiredScore) {
+    state.reservedTickets.push({ title: eventTitle, details, price });
+
+    showModal({
+      title: 'Ticket Reserved!',
+      message: `Success! Your Fan Score of ${fanScore} meets the ${requiredScore}+ requirement for "${eventTitle}". Your face-value ticket has been reserved.`,
+      icon: '🎉',
     });
 
-    showModal(
-        "Ticket Reserved!",
-        `Success! Your Fan Score of ${state.user.fanScore} meets the ${requiredScore}+ requirement for "${eventTitle}". Your face-value ticket has been reserved.`,
-        "🎉",
-        true
-    );
-
-    targetBtn.textContent = "Reserved ✓";
-    targetBtn.disabled = true;
+    button.textContent = 'Reserved ✓';
+    button.disabled = true;
   } else {
-    showModal(
-        "Access Restricted",
-        `"${eventTitle}" requires a minimum Fan Score of ${requiredScore}+. Your current Fan Score is ${state.user.fanScore}.`,
-        "🚫",
-        false
-    );
+    showModal({
+      title: 'Access Restricted',
+      message: `"${eventTitle}" requires a minimum Fan Score of ${requiredScore}+. Your current Fan Score is ${fanScore}.`,
+      icon: '🚫',
+      isSuccess: false,
+    });
   }
 }
 
-reserveBtns.forEach(button => {
-  button.addEventListener('click', handleReservation);
+
+// 8. PAGE-WIDE CLICK DELEGATION (reserve buttons + navigation links)
+document.addEventListener('click', (event) => {
+  const reserveButton = event.target.closest('.reserve-btn');
+  if (reserveButton) {
+    handleReservation(reserveButton);
+    return;
+  }
+
+  const page = event.target.closest('.nav-link')?.dataset.page;
+  if (page) {
+    event.preventDefault();
+    navigateToPage(page);
+  }
 });
+
 
 // INITIAL RENDER
 renderAuthUI();

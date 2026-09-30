@@ -4,13 +4,15 @@
   --surface: #ffffff;
   --surface-sunken: #e8eaed;
   --text-primary: #15181d;
-  --text-secondary: #4b5260;      /* legacy */
-  --text-muted: #5b6270;          /* legacy */
-  --border-color: #d5d9df;        /* legacy */
+  --text-secondary: #4b5260;
+  --text-muted: #5b6270;
+  --border-color: #d5d9df;
   --border-strong: #9aa1ad;
-  --accent-primary: #b3261e;      /* legacy */
+  --accent-primary: #b3261e;
   --accent-hover: #8f1d17;
   --on-accent: #ffffff;
+  --positive: #17663c;
+  --scrim: rgba(21, 24, 29, 0.6);
 
   /* type */
   --font-display: 'Syne', sans-serif;
@@ -34,12 +36,35 @@
   --s-12: 48px;
   --s-16: 64px;
 
-  /* radius steps up with the size of the thing */
+  /* shape: radius steps up with the size of the thing */
   --radius-control: 4px;
   --radius-card: 8px;
   --radius-dialog: 12px;
 
+  --border-width: 1px;
+  --border-thin: var(--border-width) solid var(--border-color);
+  --border-dashed: var(--border-width) dashed var(--border-strong);
+  --shadow-dialog: 0 8px 24px rgba(21, 24, 29, 0.16);
+
+  /* sizing */
   --tap-target: 44px;
+  --icon-md: 32px;
+  --icon-lg: 48px;
+  --measure-prose: 720px;
+
+  /* motion: every transition in this file must use this token, so the
+     reduced-motion override below covers all of them */
+  --duration-fast: 120ms;
+
+  /* stacking */
+  --z-header: 100;
+  --z-modal: 1000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+  }
 }
 
 
@@ -64,11 +89,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* heading scale lives here, so components only set margins */
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: var(--text-2xl);
+}
+
+h3 {
+  font-size: var(--text-xl);
 }
 
 a {
@@ -81,10 +121,19 @@ a {
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none !important;
-  }
+/* shared text treatments */
+.hero p,
+.page-header p,
+.feature-card p,
+.event-details,
+.modal-card p,
+.empty-state {
+  color: var(--text-secondary);
+}
+
+.hero p,
+.page-header p {
+  font-size: var(--text-lg);
 }
 
 
@@ -100,9 +149,9 @@ a {
 header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-header);
   background: var(--surface);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: var(--border-thin);
 }
 
 .header-inner {
@@ -113,11 +162,21 @@ header {
   min-height: var(--s-16);
 }
 
-/* nav already gets display:flex and gap from inline style */
 header nav {
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
-  row-gap: var(--s-2);
+  gap: var(--s-2) var(--s-6);   /* row column */
+}
+
+footer > .container {
+  margin-top: var(--s-16);
+  padding-block: var(--s-12);
+  border-top: var(--border-thin);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
 }
 
 .drops-section {
@@ -134,7 +193,17 @@ header nav {
 .page-header {
   padding-block: var(--s-8);
   margin-bottom: var(--s-8);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: var(--border-thin);
+}
+
+/* vertical stacks: one rule for the flex-column pattern, gap set per component */
+.event-card,
+.feature-card,
+.empty-state,
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap, var(--s-2));
 }
 
 
@@ -154,51 +223,67 @@ header nav > .nav-link {
   font-weight: 500;
   text-underline-offset: var(--s-2);
   text-decoration-thickness: 2px;
-  text-decoration-color: transparent;
-  transition: color 120ms;
+  transition: color var(--duration-fast);
 }
 
 header nav > .nav-link:hover {
   color: var(--text-primary);
 }
 
-/* buttons */
+/* buttons: variants set --btn-* values, the base rule reads them, so no
+   variant depends on source order or has to undo the base's hover */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--tap-target);
-  padding: 0 var(--s-4);
-  border: 1px solid var(--accent-primary);
+  min-height: var(--btn-height, var(--tap-target));
+  padding: 0 var(--btn-padding-x, var(--s-4));
+  border: var(--border-width) solid var(--btn-border, var(--accent-primary));
   border-radius: var(--radius-control);
-  background: var(--accent-primary);
-  color: var(--on-accent);
-  font: 600 var(--text-md)/1 var(--font-body);
+  background: var(--btn-bg, var(--accent-primary));
+  color: var(--btn-fg, var(--on-accent));
+  font: 600 var(--btn-font-size, var(--text-md))/1 var(--font-body);
   cursor: pointer;
-  transition: background-color 120ms, border-color 120ms;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast);
 }
 
-.btn:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+.btn:hover:not(:disabled) {
+  background: var(--btn-bg-hover, var(--accent-hover));
+  border-color: var(--btn-border-hover, var(--accent-hover));
 }
 
 .btn-secondary {
-  background: transparent;
-  border-color: var(--border-strong);
-  color: var(--text-primary);
+  --btn-bg: transparent;
+  --btn-bg-hover: var(--surface-sunken);
+  --btn-border: var(--border-strong);
+  --btn-border-hover: var(--border-strong);
+  --btn-fg: var(--text-primary);
 }
 
-.btn-secondary:hover {
-  background: var(--surface-sunken);
-  border-color: var(--border-strong);
+.btn-small {
+  --btn-height: var(--s-8);
+  --btn-padding-x: var(--s-2);
+  --btn-font-size: var(--text-sm);
 }
 
-/* label on an event card: how much Fan Score you need */
+/* logged-in bar, rendered by the page script */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.user-name {
+  margin-inline: var(--s-1);
+  font-weight: 600;
+}
+
+/* label: how much Fan Score you need (event card) or have (profile bar) */
 .badge {
-  align-self: flex-start;
   padding: var(--s-1) var(--s-2);
-  border: 1px solid var(--border-strong);
+  border: var(--border-width) solid var(--border-strong);
   border-radius: var(--radius-control);
   color: var(--text-primary);
   font-size: var(--text-xs);
@@ -206,58 +291,56 @@ header nav > .nav-link:hover {
   line-height: 1.33;
 }
 
+/* only inside a card's column layout; in the profile bar it stays centred */
+.event-card > .badge {
+  align-self: flex-start;
+}
+
 /* hero */
 .hero {
-  max-width: 720px;
+  max-width: var(--measure-prose);
   padding-block: var(--s-16) var(--s-8);
 }
 
 .hero h1 {
   margin-bottom: var(--s-4);
-  font-size: var(--text-3xl);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
 }
 
 .hero p {
   max-width: 56ch;
   margin-bottom: var(--s-6);
-  color: var(--text-secondary);
-  font-size: var(--text-lg);
 }
 
 .drops-section h2 {
   margin-bottom: var(--s-6);
-  font-size: var(--text-2xl);
 }
 
 /* event card, drawn as a ticket: the price row sits below a
    perforation, with a notch cut into each side of the card */
 .event-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
-  padding: var(--s-6);
-  border: 1px solid var(--border-color);
+  --card-padding: var(--s-6);
+  padding: var(--card-padding);
+  border: var(--border-thin);
   border-radius: var(--radius-card);
   background: var(--surface);
 }
 
 .event-card h3 {
   margin-top: var(--s-2);
-  font-size: var(--text-xl);
 }
 
 .event-details {
-  color: var(--text-secondary);
   font-size: var(--text-sm);
 }
 
 .price {
+  --notch-size: var(--s-4);
+  /* centre each notch on the card edge: card padding + border + half the notch */
+  --notch-offset: calc(-1 * (var(--card-padding) + var(--border-width) + var(--notch-size) / 2));
   position: relative;
   margin-block: var(--s-3);
   padding-top: var(--s-4);
-  border-top: 1px dashed var(--border-strong);
+  border-top: var(--border-dashed);
   font-size: var(--text-lg);
   font-weight: 600;
 }
@@ -266,22 +349,21 @@ header nav > .nav-link:hover {
 .price::after {
   content: "";
   position: absolute;
-  top: calc(var(--s-2) * -1);
-  width: var(--s-4);
-  height: var(--s-4);
-  border: 1px solid var(--border-color);
+  top: calc(var(--notch-size) / -2);
+  width: var(--notch-size);
+  height: var(--notch-size);
+  border: var(--border-thin);
   border-radius: 50%;
   background: var(--bg-page);
 }
 
-/* card padding + border, minus half the notch, keeps it on the card edge */
 .price::before {
-  left: calc((var(--s-6) + 1px + var(--s-2)) * -1);
+  left: var(--notch-offset);
   clip-path: inset(0 0 0 50%);
 }
 
 .price::after {
-  right: calc((var(--s-6) + 1px + var(--s-2)) * -1);
+  right: var(--notch-offset);
   clip-path: inset(0 50% 0 0);
 }
 
@@ -298,30 +380,28 @@ header nav > .nav-link:hover {
 /* feature blocks: open layout with a rule on top, so they read
    differently from the ticket cards */
 .feature-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
   padding-top: var(--s-4);
   border-top: 2px solid var(--text-primary);
 }
 
-.feature-card h3 {
-  font-size: var(--text-xl);
-}
-
-.feature-card p {
-  color: var(--text-secondary);
+.feature-icon {
+  color: var(--accent-primary);
+  font-size: var(--icon-md);
 }
 
 /* page headers */
 .page-header h2 {
   margin-bottom: var(--s-2);
-  font-size: var(--text-2xl);
 }
 
-.page-header p {
-  color: var(--text-secondary);
-  font-size: var(--text-lg);
+/* about */
+.about-content {
+  --stack-gap: var(--s-6);
+  max-width: var(--measure-prose);
+}
+
+.about-content p {
+  line-height: 1.8;
 }
 
 /* my tickets */
@@ -330,28 +410,30 @@ header nav > .nav-link:hover {
 }
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
+  --stack-gap: var(--s-4);
   align-items: center;
   justify-content: center;
-  gap: var(--s-4);
   padding: var(--s-16) var(--s-6);
-  border: 1px dashed var(--border-strong);
+  border: var(--border-dashed);
   border-radius: var(--radius-card);
-  color: var(--text-secondary);
   text-align: center;
+}
+
+.empty-state-icon {
+  color: var(--text-muted);
+  font-size: var(--icon-lg);
 }
 
 /* modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--z-modal);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: var(--s-4);
-  background: rgba(21, 24, 29, 0.6);
+  background: var(--scrim);
 }
 
 .modal-card {
@@ -359,10 +441,10 @@ header nav > .nav-link:hover {
   width: 100%;
   max-width: 440px;
   padding: var(--s-8);
-  border: 1px solid var(--border-color);
+  border: var(--border-thin);
   border-radius: var(--radius-dialog);
   background: var(--surface);
-  box-shadow: 0 8px 24px rgba(21, 24, 29, 0.16);
+  box-shadow: var(--shadow-dialog);
   text-align: center;
 }
 
@@ -394,14 +476,20 @@ header nav > .nav-link:hover {
   line-height: 1;
 }
 
+.modal-icon--success {
+  color: var(--positive);
+}
+
+.modal-icon--error {
+  color: var(--accent-primary);
+}
+
 .modal-card h3 {
   margin-bottom: var(--s-2);
-  font-size: var(--text-xl);
 }
 
 .modal-card p {
   margin-bottom: var(--s-6);
-  color: var(--text-secondary);
   font-size: var(--text-sm);
 }
 
@@ -409,11 +497,16 @@ header nav > .nav-link:hover {
   display: flex;
 }
 
+.modal-actions > .btn {
+  flex: 1;
+}
+
 
 /* --------------------------------------------------------------------------
    States
-   Classes that fanfirst.js toggles. Nothing else in this file should depend on
-   them, so the script can change without touching the components above.
+   Classes and attributes the page script toggles. Nothing else in this file
+   should depend on them, so the script can change without touching the
+   components above.
    -------------------------------------------------------------------------- */
 .page-view {
   display: none;
@@ -457,7 +550,7 @@ header nav > .nav-link.active {
     padding-top: var(--s-8);
   }
 
-  .hero h1 {
+  h1 {
     font-size: var(--text-2xl);
   }
 }
